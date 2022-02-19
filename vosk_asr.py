@@ -14,6 +14,6 @@ while True:
     if recognizer.AcceptWaveform(data):
         result = recognizer.Result()
         res = eval(result)
-        text = res['text']
-        print(text)
+        voice_data = res['text']
+        print(voice_data)
 

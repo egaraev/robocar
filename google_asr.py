@@ -12,14 +12,13 @@ def there_exists(terms):
             return True
 
 
-def listen(ask=False):
+def listen():
     r = sr.Recognizer()  # initialise a recogniser
     # listen for audio and convert it to text:
     with sr.Microphone() as source: # microphone as source
         r.pause_threshold = 1
         r.adjust_for_ambient_noise(source)
-        if ask:
-            speak(ask)
+
         print("Listening...")
         audio = r.listen(source)  # listen for the audio via source
         voice_data = ''
@@ -57,7 +56,7 @@ def respond():
         speak("Going forward")
 
     # 3: backward
-    if there_exists(["backward", "go backward", "go back", "back"]):
+    if there_exists(["backward", "go backward", "go back", "back", "beck"]):
         speak("Going backward")
 
     # 4: left
