@@ -3,15 +3,7 @@ import playsound # to play an audio file
 from gtts import gTTS # google text to speech
 import time
 import random
-from time import ctime # get time details
-import os # to remove created audio files
-
-
-class Person:
-    name = ''
-
-    def setname(self, name):
-        self.name = name
+import os  # to remove created audio files
 
 
 def there_exists(terms):
@@ -20,17 +12,19 @@ def there_exists(terms):
             return True
 
 
-r = sr.Recognizer() # initialise a recogniser
-# listen for audio and convert it to text:
-
-
-def record_audio(ask=False):
+def listen(ask=False):
+    r = sr.Recognizer()  # initialise a recogniser
+    # listen for audio and convert it to text:
     with sr.Microphone() as source: # microphone as source
+        r.pause_threshold = 1
+        r.adjust_for_ambient_noise(source)
         if ask:
             speak(ask)
+        print("Listening...")
         audio = r.listen(source)  # listen for the audio via source
         voice_data = ''
         try:
+            print("Recognizing...")
             voice_data = r.recognize_google(audio)  # convert audio to text
         except sr.UnknownValueError: # error: recognizer does not understand
             speak('I did not get that')
@@ -47,45 +41,35 @@ def speak(audio_string):
     audio_file = 'audio' + str(r) + '.mp3'
     tts.save(audio_file) # save as mp3
     playsound.playsound(audio_file) # play the audio file
-    print(f"kiri: {audio_string}") # print what app said
+    print(f"Android: {audio_string}") # print what app said
     os.remove(audio_file) # remove audio file
 
 
-def respond(voice_data):
+def respond():
     # 1: greeting
-    if there_exists(['hey','hi','hello']):
-        greetings = [f"hey, how can I help you {person_obj.name}", f"hey, what's up? {person_obj.name}", f"I'm listening {person_obj.name}", f"how can I help you? {person_obj.name}", f"hello {person_obj.name}"]
-        greet = greetings[random.randint(0,len(greetings)-1)]
+    if there_exists(['android']):
+        greetings = ["hey, how can I help you boss", "hey, what's up? boss", "I'm listening boss", "how can I help you? boss", "hello boss"]
+        greet = greetings[random.randint(0, len(greetings)-1)]
         speak(greet)
 
-    # 2: name
-    if there_exists(["what is your name","what's your name","tell me your name"]):
-        if person_obj.name:
-            speak("my name is Android")
-        else:
-            speak("my name is Android. what's your name?")
+    # 2: forward
+    if there_exists(["forward", "go forward"]):
+        speak("Going forward")
 
-    if there_exists(["my name is"]):
-        person_name = voice_data.split("is")[-1].strip()
-        speak(f"okay, i will remember that {person_name}")
-        person_obj.setname(person_name) # remember name in person object
+    # 3: backward
+    if there_exists(["backward", "go backward", "go back", "back"]):
+        speak("Going backward")
 
-    # 3: greeting
-    if there_exists(["how are you","how are you doing"]):
-        speak(f"I'm very well, thanks for asking {person_obj.name}")
+    # 4: left
+    if there_exists(["left", "go left", "turn left"]):
+        speak("Turning left")
 
-    # 4: time
-    if there_exists(["what's the time","tell me the time","what time is it"]):
-        times = ctime().split(" ")[3].split(":")[0:2]
-        if times[0] == "00":
-            hours = '12'
-        else:
-            hours = times[0]
-        minutes = times[1]
-        times = f'{hours} {minutes}'
-        speak(times)
+    # 5: right
+    if there_exists(["right", "go right", "turn right"]):
+        speak("Turning right")
 
-    # 5: finish
+
+    # 6: finish
     if there_exists(["exit", "quit", "goodbye"]):
         speak("going offline")
         exit()
@@ -93,7 +77,7 @@ def respond(voice_data):
 
 time.sleep(1)
 
-person_obj = Person()
-while 1:
-    voice_data = record_audio() # get the voice input
-    respond(voice_data) # respond
+while True:
+    voice_data = listen() # get the voice input
+    respond() # respond
+
