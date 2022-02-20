@@ -1,10 +1,12 @@
 import pyttsx3
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
-engine.setProperty('rate', 150)
-engine.runAndWait()
+import time
+#engine.runAndWait()
+
 
 def offline_speak(str):
+    engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[0].id)
+    engine.setProperty('rate', 150)
     engine.say(str)
     engine.runAndWait()

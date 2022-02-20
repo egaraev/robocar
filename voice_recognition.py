@@ -30,8 +30,9 @@ def recognize():
     if check_internet() == 'online':
         voice_data=listen()
     else:
-        import vosk_asr as offline_listen
-        voice_data = offline_listen
+        from vosk_asr import vosk as offline_listen
+        voice_data = offline_listen()
+        print(f"Offline>> {voice_data.lower()}")  # print what user said
     return voice_data
 
 
@@ -67,8 +68,8 @@ def speak(audio_string):
         os.remove(audio_file) # remove audio file
     else:
         print ("We are offline")
-        #offline_speak(audio_string)
-        #print(f"Android: {audio_string}")  # print what app said
+        offline_speak(audio_string)
+        print(f"Android: {audio_string}")  # print what app said
 
 
 def respond():
@@ -104,10 +105,8 @@ def respond():
 time.sleep(1)
 
 while True:
-    print (check_internet())
+    #print (check_internet())
     voice_data = recognize() # get the voice input
-    if check_internet() == 'online':
-        respond() # respond
-    else:
-        pass
+    respond()
+
 
