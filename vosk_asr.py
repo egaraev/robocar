@@ -17,3 +17,6 @@ while True:
         voice_data = res['text']
         print(voice_data)
 
+
+
+

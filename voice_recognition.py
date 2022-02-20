@@ -4,8 +4,20 @@ from gtts import gTTS # google text to speech
 import time
 import random
 import os  # to remove created audio files
+import requests
+from offline_tts import offline_speak
 
 
+def check_internet():
+    url = "http://www.google.com"
+    timeout = 5
+    try:
+        request = requests.get(url, timeout=timeout)
+        if request.status_code == 200:
+            return 'online'
+    except:
+        pass
+    return 'offline'
 
 
 def there_exists(terms):
@@ -15,13 +27,13 @@ def there_exists(terms):
 
 
 def recognize():
-    voice_data = ''
-
-    if listen() == '':
+    if check_internet() == 'online':
+        voice_data=listen()
+    else:
         import vosk_asr as offline_listen
         voice_data = offline_listen
-        return voice_data
     return voice_data
+
 
 def listen():
     r = sr.Recognizer()  # initialise a recogniser
@@ -45,13 +57,18 @@ def listen():
 
 # get string and make a audio file to be played
 def speak(audio_string):
-    tts = gTTS(text=audio_string, lang='en') # text to speech(voice)
-    r = random.randint(1,20000000)
-    audio_file = 'audio' + str(r) + '.mp3'
-    tts.save(audio_file) # save as mp3
-    playsound.playsound(audio_file) # play the audio file
-    print(f"Android: {audio_string}") # print what app said
-    os.remove(audio_file) # remove audio file
+    if check_internet() == 'online':
+        tts = gTTS(text=audio_string, lang='en')  # text to speech(voice)
+        r = random.randint(1,20000000)
+        audio_file = 'audio' + str(r) + '.mp3'
+        tts.save(audio_file) # save as mp3
+        playsound.playsound(audio_file) # play the audio file
+        print(f"Android: {audio_string}") # print what app said
+        os.remove(audio_file) # remove audio file
+    else:
+        print ("We are offline")
+        #offline_speak(audio_string)
+        #print(f"Android: {audio_string}")  # print what app said
 
 
 def respond():
@@ -87,6 +104,10 @@ def respond():
 time.sleep(1)
 
 while True:
+    print (check_internet())
     voice_data = recognize() # get the voice input
-    respond() # respond
+    if check_internet() == 'online':
+        respond() # respond
+    else:
+        pass
 
