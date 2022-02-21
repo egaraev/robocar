@@ -5,7 +5,8 @@ import time
 import random
 import os  # to remove created audio files
 import requests
-from offline_tts import offline_speak
+#from offline_tts import offline_speak
+import pyttsx3
 
 
 def check_internet():
@@ -55,6 +56,13 @@ def listen():
         print(f"Online>> {voice_data.lower()}") # print what user said
         return voice_data.lower()
 
+def offline_speak(str):
+    engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[0].id)
+    engine.setProperty('rate', 150)
+    engine.say(str)
+    engine.runAndWait()
 
 # get string and make a audio file to be played
 def speak(audio_string):
@@ -105,7 +113,6 @@ def respond():
 time.sleep(1)
 
 while True:
-    #print (check_internet())
     voice_data = recognize() # get the voice input
     respond()
 
