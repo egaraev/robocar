@@ -26,7 +26,7 @@ def generate_dataset(num_samples, test_size=0.33):
 if __name__ == "__main__":
 
     # create a dataset with 2000 samples
-    x_train, x_test, y_train, y_test = generate_dataset(10000, 0.3)
+    x_train, x_test, y_train, y_test = generate_dataset(20000, 0.3)
 
     # build model with 3 layers: 2 -> 5 -> 1
     model = tf.keras.models.Sequential([
