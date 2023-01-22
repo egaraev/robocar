@@ -29,9 +29,11 @@ df = pd.concat((df, EmbarkedColumnDummy, SexColumnDummy), axis=1)
 df = df.drop(['Sex','Embarked'],axis=1)
 
 
+
 # Separate the dataframe into X and y data
 X = df.values
 y = df['Survived'].values
+
 
 # Delete the Survived column from X
 X = np.delete(X,0,axis=1)

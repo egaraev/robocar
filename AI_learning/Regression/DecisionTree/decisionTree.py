@@ -7,6 +7,8 @@ file_handler = open("car_data.csv", "r")
 data = pd.read_csv(file_handler, sep=",")
 file_handler.close()
 
+print (data)
+
 data.buying[data.buying =='low'] = 1
 data.buying[data.buying =='med'] = 2
 data.buying[data.buying =='high'] = 3
