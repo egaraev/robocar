@@ -62,23 +62,21 @@ class Motor():
         self.pwmB.ChangeDutyCycle(0);
         sleep(t)
 
-def destroy():	
-	GPIO.cleanup()
 
 def main():
     motor.move(0.5, 0.0, 2)
     motor.stop(5)
-#    motor.move(-0.5, 0, 2)
-#    motor.stop(5)
-#    motor.move(0, 0.5, 2)
-#    motor.stop(2)
-#    motor.move(0, -0.5, 2)
-#    motor.stop(2)
-    destroy()
+    motor.move(-0.5, 0, 2)
+    motor.stop(5)
+    motor.move(0, 0.5, 2)
+    motor.stop(2)
+    motor.move(0, -0.5, 2)
+    motor.stop(2)
+
 
 
 
 
 if __name__ == '__main__':
-    motor = Motor(2, 3, 4, 17, 22, 27)
+    motor = Motor(27, 22, 17, 2, 4, 3)
     main()
