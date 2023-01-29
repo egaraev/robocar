@@ -4,7 +4,8 @@ import utils
 
 curveList = []
 avgVal = 10
-
+initialTrackBarVals = [137,140,83,230]
+utils.initializeTrackbars(initialTrackBarVals)
 
 def getLaneCurve(img, display=2):
     imgCopy = img.copy()
@@ -23,7 +24,7 @@ def getLaneCurve(img, display=2):
     curveAveragePoint, imgHist = utils.getHistogram(imgWarp, display=True, minPer=0.9)
     curveRaw = curveAveragePoint - middlePoint
 
-    #### SETP 4
+    #### STEP 4
     curveList.append(curveRaw)
     if len(curveList) > avgVal:
         curveList.pop(0)
@@ -57,7 +58,7 @@ def getLaneCurve(img, display=2):
 
     #### NORMALIZATION
     curve = curve / 100
-    if curve > 1: curve == 1
-    if curve < -1: curve == -1
+    if curve > 1: curve = 1
+    if curve < -1: curve = -1
 
     return curve
