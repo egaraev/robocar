@@ -26,7 +26,7 @@ class Motor():
 
     def move(self, speed=0.5, turn=0.0, t=0):
         speed *= 100
-        turn *= 100
+        turn *= 70
         leftSpeed = speed - turn
         rightSpeed = speed + turn
         if leftSpeed > 100:
@@ -64,9 +64,13 @@ class Motor():
 
 
 def main():
-    motor.move(0.6, 0, 2)
+    motor.move(0.5, 0, 2)
     motor.stop(2)
-    motor.move(-0.5, 0.2, 2)
+    motor.move(-0.5, 0, 2)
+    motor.stop(2)
+    motor.move(0, 0.5, 2)
+    motor.stop(2)
+    motor.move(0, -0.5, 2)
     motor.stop(2)
 
 
