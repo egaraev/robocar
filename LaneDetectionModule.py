@@ -4,7 +4,7 @@ import utils
 
 curveList = []
 avgVal = 10
-initialTrackBarVals = [137,140,83,230]
+initialTrackBarVals = [77,175,0,223]
 utils.initializeTrackbars(initialTrackBarVals)
 
 def getLaneCurve(img, display=2):
@@ -17,6 +17,7 @@ def getLaneCurve(img, display=2):
     hT, wT, c = img.shape
     points = utils.valTrackbars()
     imgWarp = utils.warpImg(imgThres, points, wT, hT)
+    imgWarp1 = utils.warpImg(img, points, wT, hT)
     imgWarpPoints = utils.drawPoints(imgCopy, points)
 
     #### STEP 3
@@ -40,7 +41,10 @@ def getLaneCurve(img, display=2):
         imgLaneColor = cv2.bitwise_and(imgInvWarp, imgLaneColor)
         imgResult = cv2.addWeighted(imgResult, 1, imgLaneColor, 1, 0)
         midY = 450
-        cv2.putText(imgResult, str(curve), (wT // 2 - 80, 85), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 0, 255), 3)
+        if curve>5: direction = "-->"
+        elif curve<-5: direction = "<--"
+        else: direction = "^"
+        cv2.putText(imgResult, str(curve)+direction, (wT // 2 - 80, 85), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 0, 255), 3)
         cv2.line(imgResult, (wT // 2, midY), (wT // 2 + (curve * 3), midY), (255, 0, 255), 5)
         cv2.line(imgResult, ((wT // 2 + (curve * 3)), midY - 25), (wT // 2 + (curve * 3), midY + 25), (0, 255, 0), 5)
         for x in range(-30, 30):
@@ -50,8 +54,8 @@ def getLaneCurve(img, display=2):
         # fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer);
         # cv2.putText(imgResult, 'FPS ' + str(int(fps)), (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (230, 50, 50), 3);
     if display == 2:
-        imgStacked = utils.stackImages(0.7, ([img, imgWarpPoints, imgWarp],
-                                             [imgHist, imgLaneColor, imgResult]))
+        imgStacked = utils.stackImages(0.7, ([img, imgWarpPoints, imgWarp1],
+                                             [imgHist, imgWarp, imgResult]))
         cv2.imshow('ImageStack', imgStacked)
     elif display == 1:
         cv2.imshow('Resutlt', imgResult)

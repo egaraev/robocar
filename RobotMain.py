@@ -13,7 +13,7 @@ def main():
     img = CameraModule.getImg()
     curveVal = getLaneCurve(img,2)
 
-    sen = 1.5 # Sensitivity
+    sen = 1.3 # Sensitivity
     maxVAl = 0.2  #Max speed
     if curveVal>maxVAl: curveVal=maxVAl
     if curveVal<-maxVAl: curveVal=-maxVAl
@@ -22,11 +22,11 @@ def main():
         sen = 1.7
         if curveVal<0.05: curveVal=0
     else:
-        if curveVal>-0.08: curveVal=0
+        if curveVal>-0.05: curveVal=0
 
     motor.move(0.25, -curveVal*sen,0.05)
 
-    #cv2.waitKey(1)
+    cv2.waitKey(1)
 
 
 
