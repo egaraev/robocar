@@ -4,7 +4,7 @@ import utils
 
 curveList = []
 avgVal = 10
-initialTrackBarVals = [77,175,0,223]
+initialTrackBarVals = [92,123,0,215]
 utils.initializeTrackbars(initialTrackBarVals)
 
 def getLaneCurve(img, display=2):
