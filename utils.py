@@ -4,9 +4,16 @@ import numpy as np
 
 def thresholding(img):
     imgHsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lowerWhite = np.array([0, 0, 95])
-    upperWhite = np.array([179, 255, 160])
-    maskWhite = cv2.inRange(imgHsv, lowerWhite, upperWhite)
+    h_min = cv2.getTrackbarPos("HUE Min","HSV")
+    h_max = cv2.getTrackbarPos("HUE Max", "HSV")
+    s_min = cv2.getTrackbarPos("SAT Min", "HSV")
+    s_max = cv2.getTrackbarPos("SAT Max", "HSV")
+    v_min = cv2.getTrackbarPos("VALUE Min", "HSV")
+    v_max = cv2.getTrackbarPos("VALUE Max", "HSV")
+    lower = np.array([h_min,s_min,v_min])
+    upper = np.array([h_max,s_max,v_max])
+    mask = cv2.inRange(imgHsv,lower,upper)
+    maskWhite=mask
     return maskWhite
 
 
@@ -33,6 +40,16 @@ def initializeTrackbars(intialTracbarVals, wT=480, hT=240):
     cv2.createTrackbar("Width Bottom", "Trackbars", intialTracbarVals[2], wT // 2, nothing)
     cv2.createTrackbar("Height Bottom", "Trackbars", intialTracbarVals[3], hT, nothing)
 
+def colorpickupTrackbars(initialColorVals):
+    cv2.namedWindow("HSV")
+    cv2.resizeWindow("HSV",320,240)
+    cv2.createTrackbar("HUE Min","HSV",initialColorVals[0],179,nothing)
+    cv2.createTrackbar("SAT Min","HSV",initialColorVals[1],255,nothing)
+    cv2.createTrackbar("VALUE Min","HSV",initialColorVals[2],255,nothing)
+    cv2.createTrackbar("HUE Max","HSV",initialColorVals[3],179,nothing)
+    cv2.createTrackbar("SAT Max","HSV",initialColorVals[4],255,nothing)
+    cv2.createTrackbar("VALUE Max","HSV",initialColorVals[5],255,nothing)
+
 
 def valTrackbars(wT=480, hT=240):
     widthTop = cv2.getTrackbarPos("Width Top", "Trackbars")
@@ -42,6 +59,7 @@ def valTrackbars(wT=480, hT=240):
     points = np.float32([(widthTop, heightTop), (wT - widthTop, heightTop),
                          (widthBottom, heightBottom), (wT - widthBottom, heightBottom)])
     return points
+
 
 
 def drawPoints(img, points):

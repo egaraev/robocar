@@ -5,7 +5,9 @@ import utils
 curveList = []
 avgVal = 10
 initialTrackBarVals = [92,123,0,215]
+initialColorVals = [85, 0, 110, 179, 255, 160]
 utils.initializeTrackbars(initialTrackBarVals)
+utils.colorpickupTrackbars(initialColorVals)
 
 def getLaneCurve(img, display=2):
     imgCopy = img.copy()

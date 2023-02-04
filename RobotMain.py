@@ -24,7 +24,7 @@ def main():
     else:
         if curveVal>-0.05: curveVal=0
 
-    motor.move(0.22, -curveVal*sen,0.05)
+    #motor.move(0.22, -curveVal*sen,0.05)
 
     cv2.waitKey(1)
 
