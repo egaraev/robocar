@@ -57,6 +57,15 @@ class Motor():
 
         sleep(t)
 
+    def backward(self, speed=0.3, t=0):
+        self.pwmA.ChangeDutyCycle(speed);
+        self.pwmB.ChangeDutyCycle(speed);
+        GPIO.output(self.In1A, GPIO.LOW)
+        GPIO.output(self.In2A, GPIO.HIGH)
+        GPIO.output(self.In1B, GPIO.LOW)
+        GPIO.output(self.In2B, GPIO.HIGH)
+        sleep(t)        
+        
     def stop(self, t=0):
         self.pwmA.ChangeDutyCycle(0);
         self.pwmB.ChangeDutyCycle(0);
@@ -67,8 +76,8 @@ def main():
     print ("Move forward")
     motor.move(0.3, 0.0, 2)
     motor.stop(5)
-
-    motor.move(-0.3, 0.0, 2)
+    print ("Move backward")
+    motor.backward(0.3, 2)
     motor.stop(5)
     print ("Move Left")
     motor.move(0, 0.5, 2)
