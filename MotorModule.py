@@ -64,14 +64,18 @@ class Motor():
 
 
 def main():
-    motor.move(0.5, 0.0, 2)
+    print ("Move forward")
+    motor.move(0.3, 0.0, 2)
     motor.stop(5)
-    motor.move(-0.5, 0, 2)
+
+    motor.move(-0.3, 0.0, 2)
     motor.stop(5)
+    print ("Move Left")
     motor.move(0, 0.5, 2)
-    motor.stop(2)
+    motor.stop(5)
+    print ("Move Right")
     motor.move(0, -0.5, 2)
-    motor.stop(2)
+    motor.stop(5)
 
 
 
