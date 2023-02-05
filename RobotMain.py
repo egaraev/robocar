@@ -6,7 +6,7 @@ import CameraModule
 import cv2
 
 #################################
-motor = Motor(27, 22, 17, 2, 4, 3)
+motor = Motor(22, 27, 17, 2, 4, 3)
 #################################
 
 def main():

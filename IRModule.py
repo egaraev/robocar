@@ -11,8 +11,8 @@ right_sensor = 11
 GPIO.setup(left_sensor, GPIO.IN)
 GPIO.setup(central_sensor, GPIO.IN)
 GPIO.setup(right_sensor, GPIO.IN)
-speed = 0.23
-curveVal = 0.1
+speed = 0.25
+curveVal = 0.3
 sens = 1.7
 
 while True:
