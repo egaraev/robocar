@@ -1,7 +1,7 @@
 from RPi import GPIO
 from time import sleep
 from MotorModule import Motor
-motor = Motor(27, 22, 17, 2, 4, 3)
+motor = Motor(22, 27, 17, 2, 4, 3)
 GPIO.setmode(GPIO.BCM)
 
 left_sensor = 10

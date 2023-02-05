@@ -2,11 +2,15 @@ import speech_recognition as sr # recognise speech
 import playsound # to play an audio file
 from gtts import gTTS # google text to speech
 import time
+from time import sleep
 import random
 import os  # to remove created audio files
 import requests
 #from offline_tts import offline_speak
 import pyttsx3
+from MotorModule import Motor
+motor = Motor(22, 27, 17, 2, 4, 3)
+import sys
 
 
 def check_internet():
@@ -38,9 +42,11 @@ def recognize():
 
 
 def listen():
+    speak("Listening to your order")
     r = sr.Recognizer()  # initialise a recogniser
     # listen for audio and convert it to text:
     with sr.Microphone() as source: # microphone as source
+
         r.pause_threshold = 1
         r.adjust_for_ambient_noise(source)
         print("Online Listening...")
@@ -90,24 +96,32 @@ def respond():
     # 2: forward
     if there_exists(["forward", "go forward"]):
         speak("Going forward")
+        motor.move(0.25, 0.0, 2)
 
     # 3: backward
     if there_exists(["backward", "go backward", "go back", "back", "beck"]):
         speak("Going backward")
+        motor.backward(0.25, 2)
 
     # 4: left
     if there_exists(["left", "go left", "turn left"]):
         speak("Turning left")
+        motor.move(0, 0.25, 2)
 
     # 5: right
     if there_exists(["right", "go right", "turn right"]):
         speak("Turning right")
+        motor.move(0, -0.25, 2)
 
+    # 6: stop
+    if there_exists(["stop", "finish"]):
+        speak("Stopping")
+        motor.stop(5)
 
-    # 6: finish
+    # 7: finish
     if there_exists(["exit", "quit", "goodbye"]):
         speak("going offline")
-        exit()
+        sys.exit()
 
 
 time.sleep(1)
@@ -115,5 +129,4 @@ time.sleep(1)
 while True:
     voice_data = recognize() # get the voice input
     respond()
-
 
