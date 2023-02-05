@@ -8,7 +8,8 @@ __pycache__/
 
 
 *.h264
-
+*.mp3
+*.wav
 # Distribution / packaging
 .Python
 build/
