@@ -6,10 +6,15 @@ https://pimylifeup.com/raspberry-pi-playstation-controllers/
 https://github.com/sgmoorthy/PS3RasPiRobot
 
 sudo apt-get -y install jd
+
 sudo apt-get install libusb-dev joystick python-pygame -y
+
 mkdir ~/sixpair
+
 cd ~/sixpair
+
 wget http://www.pabr.org/sixlinux/sixpair.c
+
 gcc -o sixpair sixpair.c -lusb
 
 With Sixpair now compiled on our Raspberry Pi, we need to plug our PS3 Controller into the Raspberry Pi using the USB mini cable.
@@ -17,6 +22,7 @@ Once the controller has been plugged in, we can run sixpair by running the comma
 Sixpair will re-configure the controller so that it will talk with our Bluetooth device.
 
 sudo ~/sixpair/sixpair
+
 sudo bluetoothctl
 
 Result screen
@@ -35,6 +41,7 @@ trust A3:2B:4D:7F:2F:A7
 Result [CHG] Device A3:2B:4D:7F:2F:A7 Trusted: yes 
 Changing A3:2B:4D:7F:2F:A7 
 trust succeeded [CHG] Device A3:2B:4D:7F:2F:A7 Connected: yes
+
 
 ----------------------
 Raspbian GNU/Linux 11 (bullseye) 32 bit
