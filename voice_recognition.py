@@ -96,22 +96,22 @@ def respond():
     # 2: forward
     if there_exists(["forward", "go forward"]):
         speak("Going forward")
-        motor.move(0.25, 0.0, 2)
+        motor.move(0.3, 0.0, 2)
 
     # 3: backward
     if there_exists(["backward", "go backward", "go back", "back", "beck"]):
         speak("Going backward")
-        motor.backward(0.25, 2)
+        motor.backward(0.3, 2)
 
     # 4: left
     if there_exists(["left", "go left", "turn left"]):
         speak("Turning left")
-        motor.move(0, 0.25, 2)
+        motor.move(0, 0.4, 2)
 
     # 5: right
     if there_exists(["right", "go right", "turn right"]):
         speak("Turning right")
-        motor.move(0, -0.25, 2)
+        motor.move(0, -0.4, 2)
 
     # 6: stop
     if there_exists(["stop", "finish"]):
