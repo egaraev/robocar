@@ -116,7 +116,7 @@ def respond():
     # 6: stop
     if there_exists(["stop", "finish"]):
         speak("Stopping")
-        motor.stop(5)
+        motor.stop()
 
     # 7: finish
     if there_exists(["exit", "quit", "goodbye"]):
@@ -129,4 +129,3 @@ time.sleep(1)
 while True:
     voice_data = recognize() # get the voice input
     respond()
-

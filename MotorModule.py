@@ -85,7 +85,7 @@ def main():
     motor.stop(5)
     print ("Move Right")
     motor.move(0, -0.5, 2)
-    motor.stop(5)
+    motor.stop()
 
 
 

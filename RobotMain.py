@@ -1,5 +1,3 @@
-import cv2
-
 from MotorModule import Motor
 from LaneDetectionModule import getLaneCurve
 import CameraModule
