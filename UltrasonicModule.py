@@ -37,13 +37,12 @@ try:
             pulse_end = time.time()
             pulse_duration = pulse_end - pulse_start
             distance = pulse_duration * 17150
-            distance = round(distance, 2)
+            distance = round(distance+1.15, 2)
             avgDistance = avgDistance+distance
-            avgDistance=avgDistance/5
-            #print(avgDistance)
+            avgDistance=avgDistance/2
         flag =0
-        if avgDistance<15:
-            print ("distance:",avgDistance,"cm")
+        if avgDistance<=15:
+            print ("Average distance is:",avgDistance,"cm")
             count = count+1
             motor.stop()
             time.sleep(1)
@@ -52,17 +51,17 @@ try:
             time.sleep(1.5)
             if count%3==1&(flag==0):
                 print ("Move right")
-                motor.move(0, -0.7, 0.5)
+                motor.move(0, -0.8, 1)
                 flag=1
             else:
                 print ("Move left")
-                motor.move(0, 0.7, 0.5)
+                motor.move(0, 0.8, 1)
                 flag =0
                 time.sleep(1.5)
                 motor.stop()
                 time.sleep(1)
         else:
-            print ("distance:",avgDistance,"cm")
+            print ("Average distance is:",avgDistance,"cm")
             print ("Move forward")
             motor.move(0.3, 0.0, 0.5)
             flag =0
