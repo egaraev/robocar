@@ -41,7 +41,7 @@ try:
             avgDistance = avgDistance+distance
             avgDistance=avgDistance/2
         flag =0
-        if avgDistance<=15:
+        if avgDistance<=20:
             print ("Average distance is:",avgDistance,"cm")
             count = count+1
             motor.stop()
@@ -63,7 +63,7 @@ try:
         else:
             print ("Average distance is:",avgDistance,"cm")
             print ("Move forward")
-            motor.move(0.3, 0.0, 0.5)
+            motor.move(0.3, 0.0, 0.3)
             flag =0
 
 except KeyboardInterrupt:
