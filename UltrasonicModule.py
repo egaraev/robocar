@@ -38,10 +38,10 @@ try:
             pulse_duration = pulse_end - pulse_start
             distance = pulse_duration * 17150
             avgDistance = round(distance+1.15, 2)
-            print ("Average distance is:",avgDistance,"cm")
+
         flag =0
         if avgDistance<=25:
-
+            print ("Average distance is:",avgDistance,"cm")
             count = count+1
             motor.stop()
             time.sleep(1)

@@ -57,6 +57,7 @@ class Motor():
 
         sleep(t)
 
+
     def backward(self, speed=0.3, t=0):
         speed *= 100
         self.pwmA.ChangeDutyCycle(speed);
@@ -67,11 +68,14 @@ class Motor():
         GPIO.output(self.In2B, GPIO.HIGH)
         sleep(t)
 
+
     def stop(self, t=0):
         self.pwmA.ChangeDutyCycle(0);
         self.pwmB.ChangeDutyCycle(0);
         sleep(t)
 
+
+GPIO.cleanup()
 
 def main():
     print ("Move forward")
