@@ -17,8 +17,6 @@ GPIO.output(TRIG, False)
 print ("Calibrating.....")
 time.sleep(2)
 
-print ("Place the object......")
-
 
 try:
     count =0
@@ -38,31 +36,35 @@ try:
         while GPIO.input(ECHO)==1:
             pulse_end = time.time()
             pulse_duration = pulse_end - pulse_start
-
             distance = pulse_duration * 17150
             distance = round(distance, 2)
             avgDistance = avgDistance+distance
             avgDistance=avgDistance/5
-            print(avgDistance)
+            #print(avgDistance)
         flag =0
-        if avgDistance<20:
-            print ("distance:",distance,"cm")
+        if avgDistance<15:
+            print ("distance:",avgDistance,"cm")
             count = count+1
             motor.stop()
             time.sleep(1)
-            motor.backward(0.3, 1)
+            print ("Move backward")
+            motor.backward(0.3, 0.5)
             time.sleep(1.5)
             if count%3==1&(flag==0):
-                motor.move(0, -0.7, 1)
+                print ("Move right")
+                motor.move(0, -0.7, 0.5)
                 flag=1
             else:
-                motor.move(0, 0.7, 1)
+                print ("Move left")
+                motor.move(0, 0.7, 0.5)
                 flag =0
                 time.sleep(1.5)
                 motor.stop()
                 time.sleep(1)
         else:
-            motor.move(0.3, 0.0, 1)
+            print ("distance:",avgDistance,"cm")
+            print ("Move forward")
+            motor.move(0.3, 0.0, 0.5)
             flag =0
 
 except KeyboardInterrupt:
