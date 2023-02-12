@@ -6,7 +6,7 @@ from time import sleep
 import random
 import os  # to remove created audio files
 import requests
-#from offline_tts import offline_speak
+from offline_tts import offline_speak
 import pyttsx3
 from MotorModule import Motor
 motor = Motor(22, 27, 17, 2, 4, 3)
