@@ -6,11 +6,16 @@ from time import sleep
 import random
 import os  # to remove created audio files
 import requests
-from offline_tts import offline_speak
 import pyttsx3
 from MotorModule import Motor
 motor = Motor(22, 27, 17, 2, 4, 3)
 import sys
+from vosk import Model, KaldiRecognizer
+import pyaudio
+model = Model('vosk-model')
+recognizer = KaldiRecognizer(model, 16000)
+cap = pyaudio.PyAudio()
+stream = cap.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8192)
 
 
 def check_internet():
@@ -35,7 +40,6 @@ def recognize():
     if check_internet() == 'online':
         voice_data=listen()
     else:
-        from vosk_asr import vosk as offline_listen
         voice_data = offline_listen()
         print(f"Offline>> {voice_data.lower()}")  # print what user said
     return voice_data
@@ -68,7 +72,24 @@ def offline_speak(str):
     engine.setProperty('voice', voices[0].id)
     engine.setProperty('rate', 150)
     engine.say(str)
+    time.sleep(1)
     engine.runAndWait()
+
+
+
+
+def offline_listen():
+    stream.start_stream()
+    while True:
+        voice_data=''
+        data = stream.read(4096, exception_on_overflow = False)
+        if recognizer.AcceptWaveform(data):
+            result = recognizer.Result()
+            res = eval(result)
+            voice_data = res['text']
+        return voice_data
+
+
 
 # get string and make a audio file to be played
 def speak(audio_string):
