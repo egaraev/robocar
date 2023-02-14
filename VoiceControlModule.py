@@ -7,8 +7,6 @@ import random
 import os  # to remove created audio files
 import requests
 import pyttsx3
-#from MotorModule import Motor
-#motor = Motor(22, 27, 17, 2, 4, 3)
 import paho.mqtt.client as mqtt
 import sys
 from vosk import Model, KaldiRecognizer
@@ -121,31 +119,30 @@ def respond():
         speak("Going forward")
         return "forward"
 
-        #motor.move(0.25, 0.0, 2)
 
     # 3: backward
     if there_exists(["backward", "go backward", "go back", "back", "beck"]):
         speak("Going backward")
         return 'backward'
-        #motor.backward(0.25, 2)
+
 
     # 4: left
     if there_exists(["left", "go left", "turn left"]):
         speak("Turning left")
         return 'left'
-        #motor.move(0, 0.25, 2)
+
 
     # 5: right
     if there_exists(["right", "go right", "turn right"]):
         speak("Turning right")
         return 'right'
-        #motor.move(0, -0.25, 2)
+
 
     # 6: stop
     if there_exists(["stop", "finish"]):
         speak("Stopping")
         return 'stop'
-        #motor.stop(5)
+
 
 
     # 7: finish
@@ -165,4 +162,3 @@ while True:
     message = respond()
     print (message)
     client.publish("pibot/move", str(message), qos=1)
-

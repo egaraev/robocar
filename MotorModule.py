@@ -100,22 +100,22 @@ def messageDecoder(client, userdata, msg):
 
     if message == "forward":
         print("^^^ moving forward! ^^^")
-        motor.move(0.3, 0.0, 2)
+        motor.move(0.25, 0.0, 2)
         motor.stop(5)
     elif message == "stop":
         print("!!! stopping!")
         motor.stop()
     elif message == "backward":
         print("\/ backward \/")
-        motor.backward(0.5, 2)
+        motor.backward(0.25, 2)
         motor.stop(5)
     elif message == "left":
         print("<- left")
-        motor.move(0, 0.5, 2)
+        motor.move(0, 0.25, 2)
         motor.stop(5)
     elif message == "right":
         print("-> right")
-        motor.move(0, -0.5, 2)
+        motor.move(0, -0.25, 2)
         motor.stop()
     else:
         print("moving")
