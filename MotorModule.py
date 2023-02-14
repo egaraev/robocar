@@ -5,6 +5,15 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 #
 
+serverAddress = "test.mosquitto.org"
+import paho.mqtt.client as mqtt
+clientName = "PiBot"
+client = mqtt.Client()
+didPrintSubscribeMessage = False
+
+
+
+
 class Motor():
     def __init__(self, EnaA, In1A, In2A, EnaB, In1B, In2B):
         self.EnaA = EnaA
@@ -77,19 +86,66 @@ class Motor():
 
 GPIO.cleanup()
 
-def main():
-    print ("Move forward")
-    motor.move(0.3, 0.0, 2)
-    motor.stop(5)
-    print ("Move backward")
-    motor.backward(0.5, 2)
-    motor.stop(5)
-    print ("Move Left")
-    motor.move(0, 0.5, 2)
-    motor.stop(5)
-    print ("Move Right")
-    motor.move(0, -0.5, 2)
-    motor.stop()
+def connectionStatus(client, userdata, flags, rc):
+    global didPrintSubscribeMessage
+    if not didPrintSubscribeMessage:
+        didPrintSubscribeMessage = True
+        print("subscribing")
+        client.subscribe("pibot/move")
+        print("subscribed")
+
+
+def messageDecoder(client, userdata, msg):
+    message = msg.payload.decode(encoding='UTF-8')
+
+    if message == "forward":
+        print("^^^ moving forward! ^^^")
+        motor.move(0.25, 0.0, 2)
+        motor.stop(5)
+    elif message == "stop":
+        print("!!! stopping!")
+        motor.stop()
+    elif message == "backward":
+        print("\/ backward \/")
+        motor.backward(0.25, 2)
+        motor.stop(5)
+    elif message == "left":
+        print("<- left")
+        motor.move(0, 0.25, 2)
+        motor.stop(5)
+    elif message == "right":
+        print("-> right")
+        motor.move(0, -0.25, 2)
+        motor.stop()
+    else:
+        print("moving")
+        motor.move(message)
+
+
+# Set up calling functions to mqttClient
+client.on_connect = connectionStatus
+client.on_message = messageDecoder
+
+# Connect to the MQTT server & loop forever.
+# CTRL-C will stop the program from running.
+print("server address is:", serverAddress)
+client.connect("test.mosquitto.org", 1883, 60)
+client.loop_forever()
+
+
+# def main():
+#     print ("Move forward")
+#     motor.move(0.3, 0.0, 2)
+#     motor.stop(5)
+#     print ("Move backward")
+#     motor.backward(0.5, 2)
+#     motor.stop(5)
+#     print ("Move Left")
+#     motor.move(0, 0.5, 2)
+#     motor.stop(5)
+#     print ("Move Right")
+#     motor.move(0, -0.5, 2)
+#     motor.stop()
 
 
 
@@ -97,4 +153,4 @@ def main():
 
 if __name__ == '__main__':
     motor = Motor(22, 27, 17, 2, 4, 3)
-    main()
+    # main()

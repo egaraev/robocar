@@ -7,8 +7,7 @@ import random
 import os  # to remove created audio files
 import requests
 import pyttsx3
-from MotorModule import Motor
-motor = Motor(22, 27, 17, 2, 4, 3)
+import paho.mqtt.client as mqtt
 import sys
 from vosk import Model, KaldiRecognizer
 import pyaudio
@@ -16,6 +15,7 @@ model = Model('vosk-model')
 recognizer = KaldiRecognizer(model, 16000)
 cap = pyaudio.PyAudio()
 stream = cap.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8192)
+
 
 
 def check_internet():
@@ -117,27 +117,33 @@ def respond():
     # 2: forward
     if there_exists(["forward", "go forward"]):
         speak("Going forward")
-        motor.move(0.25, 0.0, 2)
+        return "forward"
+
 
     # 3: backward
     if there_exists(["backward", "go backward", "go back", "back", "beck"]):
         speak("Going backward")
-        motor.backward(0.25, 2)
+        return 'backward'
+
 
     # 4: left
     if there_exists(["left", "go left", "turn left"]):
         speak("Turning left")
-        motor.move(0, 0.25, 2)
+        return 'left'
+
 
     # 5: right
     if there_exists(["right", "go right", "turn right"]):
         speak("Turning right")
-        motor.move(0, -0.25, 2)
+        return 'right'
+
 
     # 6: stop
     if there_exists(["stop", "finish"]):
         speak("Stopping")
-        motor.stop(5)
+        return 'stop'
+
+
 
     # 7: finish
     if there_exists(["exit", "quit", "goodbye"]):
@@ -147,7 +153,12 @@ def respond():
 
 time.sleep(1)
 
+client = mqtt.Client()
+client.connect("test.mosquitto.org", 1883, 60)
+
+
 while True:
     voice_data = recognize() # get the voice input
-    respond()
-
+    message = respond()
+    print (message)
+    client.publish("pibot/move", str(message), qos=1)
