@@ -149,10 +149,14 @@ def respond():
         speak("Enabling line follow")
         return 'line_on'
 
-    if there_exists(["voice", "disable line", "line unfollow"]):
+    if there_exists(["disable line", "line unfollow"]):
         speak("Disabling line follow")
         return 'line_off'
 
+    # 8: wait
+    if there_exists(["wait", "hold on"]):
+        speak("waiting")
+        time.sleep(10)
 
     # 8: finish
     if there_exists(["exit", "quit", "goodbye"]):

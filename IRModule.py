@@ -1,27 +1,43 @@
-from RPi import GPIO
-from time import sleep
-from MotorModule import Motor
-motor = Motor(22, 27, 17, 2, 4, 3)
-GPIO.setmode(GPIO.BCM)
+import paho.mqtt.client as mqtt
+import subprocess
 
-left_sensor = 10
-central_sensor = 9
-right_sensor = 11
 
-GPIO.setup(left_sensor, GPIO.IN)
-GPIO.setup(central_sensor, GPIO.IN)
-GPIO.setup(right_sensor, GPIO.IN)
-speed = 0.25
-curveVal = 0.3
-sens = 1.7
 
-while True:
-    if  GPIO.input(right_sensor) and GPIO.input(central_sensor):
-        print("Robot is straying off to the right, move left captain!")
-        motor.move(speed, curveVal*sens, 0.05)
-    elif  GPIO.input(left_sensor) and GPIO.input(central_sensor):
-        print("Robot is straying off to the left, move right captain!")
-        motor.move(speed, -curveVal*sens, 0.05)
-    elif GPIO.input(right_sensor) and GPIO.input(left_sensor):
-        print("Following the line!")
-        motor.move(speed, 0.0, 0.05)
+serverAddress = "test.mosquitto.org"
+clientName = "PiBot"
+client = mqtt.Client()
+didPrintSubscribeMessage = False
+
+def connectionStatus(client, userdata, flags, rc):
+    global didPrintSubscribeMessage
+    if not didPrintSubscribeMessage:
+        didPrintSubscribeMessage = True
+        print("subscribing")
+        client.subscribe("pibot/line")
+        print("subscribed")
+
+
+def messageDecoder(client, userdata, msg):
+    message = msg.payload.decode(encoding='UTF-8')
+    if message =="line_on":
+        print ("Starting Line follow")
+        subprocess.call(['sh', './start_line_follow.sh'])
+    else:
+        print ("Stopping Line follow")
+        subprocess.call(['sh', './stop_line_follow.sh'])
+
+
+
+# Set up calling functions to mqttClient
+client.on_connect = connectionStatus
+client.on_message = messageDecoder
+
+
+# Connect to the MQTT server & loop forever.
+# CTRL-C will stop the program from running.
+print("server address is:", serverAddress)
+client.connect("test.mosquitto.org", 1883, 60)
+
+client.loop_forever()
+
+
