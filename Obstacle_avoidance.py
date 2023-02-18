@@ -1,8 +1,6 @@
 import paho.mqtt.client as mqtt
 import subprocess
 
-
-
 serverAddress = "test.mosquitto.org"
 clientName = "PiBot"
 client = mqtt.Client()
@@ -13,31 +11,23 @@ def connectionStatus(client, userdata, flags, rc):
     if not didPrintSubscribeMessage:
         didPrintSubscribeMessage = True
         print("subscribing")
-        client.subscribe("pibot/line")
+        client.subscribe("pibot/ultrasonic")
         print("subscribed")
 
 
 def messageDecoder(client, userdata, msg):
     message = msg.payload.decode(encoding='UTF-8')
-    if message =="line_on":
-        print ("Starting Line follow")
-        subprocess.call(['sh', '/home/eldar/robocar/start_line_follow.sh'])
+    if message =="ultrasonic_on":
+        print ("Obstacle avoidance start")
+        subprocess.call(['sh', '/home/eldar/robocar/start_obstacle_avoid.sh'])
     else:
-        print ("Stopping Line follow")
-        subprocess.call(['sh', '/home/eldar/robocar/stop_line_follow.sh'])
-
+        print ("Obstacle avoidance stop")
+        subprocess.call(['sh', '/home/eldar/robocar/stop_obstacle_avoid.sh'])
 
 
 # Set up calling functions to mqttClient
 client.on_connect = connectionStatus
 client.on_message = messageDecoder
-
-
-# Connect to the MQTT server & loop forever.
-# CTRL-C will stop the program from running.
 print("server address is:", serverAddress)
 client.connect("test.mosquitto.org", 1883, 60)
-
 client.loop_forever()
-
-

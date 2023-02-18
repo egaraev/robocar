@@ -156,9 +156,20 @@ def respond():
     # 8: wait
     if there_exists(["wait", "hold on"]):
         speak("waiting")
-        time.sleep(10)
+        time.sleep(60)
 
-    # 8: finish
+
+    # 9: line following
+    if there_exists(["enable ultrasonic", "ultrasonic on"]):
+        speak("Enabling ultrasonic")
+        return 'ultrasonic_on'
+
+    if there_exists(["disable ultrasonic", "ultrasonic unfollow"]):
+        speak("Disabling ultrasonic")
+        return 'ultrasonic_off'
+
+
+    # 10: finish
     if there_exists(["exit", "quit", "goodbye"]):
         speak("going offline")
         sys.exit()
@@ -176,5 +187,7 @@ while True:
     print (message)
     if message=='line_on' or message=='line_off':
         client.publish("pibot/line", str(message), qos=1)
+    elif message=='ultrasonic_on' or message=='ultrasonic_off':
+        client.publish("pibot/ultrasonic", str(message), qos=1)
     else:
         client.publish("pibot/move", str(message), qos=1)
