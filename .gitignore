@@ -6,7 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
-
+nohup.out
 *.h264
 *.mp3
 *.wav

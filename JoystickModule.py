@@ -1,6 +1,9 @@
 # Load library functions we want
 import time
 import pygame
+import os
+import sys
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 from MotorModule import Motor
 motor = Motor(22, 27, 17, 2, 4, 3)
 
@@ -27,6 +30,7 @@ pygame.init()
 pygame.joystick.init()
 joystick = pygame.joystick.Joystick(0)
 joystick.init()
+
 
 # Function to handle pygame events
 def PygameHandler(events):
@@ -92,6 +96,8 @@ def PygameHandler(events):
             else:
                 moveLeft = False
                 moveRight = False
+
+
 try:
     print ('Press [ESC] or Press PS3 O button to quit')
     # Loop indefinitely
@@ -120,7 +126,6 @@ try:
                 motor.stop()
         # Wait for the interval period
         time.sleep(interval)
-
 except KeyboardInterrupt:
     # CTRL+C exit, disable all drives
     motor.stop(5)

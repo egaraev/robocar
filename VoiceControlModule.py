@@ -56,6 +56,7 @@ def listen():
         print("Online Listening...")
         audio = r.listen(source)  # listen for the audio via source
         voice_data = ''
+
         try:
             print("Online Recognizing...")
             voice_data = r.recognize_google(audio)  # convert audio to text
@@ -143,9 +144,17 @@ def respond():
         speak("Stopping")
         return 'stop'
 
+    # 7: line following
+    if there_exists(["enable line", "line follow"]):
+        speak("Enabling line follow")
+        return 'line_on'
+
+    if there_exists(["voice", "disable line", "line unfollow"]):
+        speak("Disabling line follow")
+        return 'line_off'
 
 
-    # 7: finish
+    # 8: finish
     if there_exists(["exit", "quit", "goodbye"]):
         speak("going offline")
         sys.exit()
@@ -161,4 +170,7 @@ while True:
     voice_data = recognize() # get the voice input
     message = respond()
     print (message)
-    client.publish("pibot/move", str(message), qos=1)
+    if message=='line_on' or message=='line_off':
+        client.publish("pibot/line", str(message), qos=1)
+    else:
+        client.publish("pibot/move", str(message), qos=1)

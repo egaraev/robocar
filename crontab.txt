@@ -1,0 +1,3 @@
+* * * * * /home/eldar/robocar/joysticktest.sh >>/home/eldar/robocar/nohup.out 2>&1
+* * * * * /home/eldar/robocar/start_service.sh >>/home/eldar/robocar/nohup.out 2>&1
+
