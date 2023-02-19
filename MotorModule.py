@@ -74,8 +74,8 @@ class Motor():
         self.pwmB.ChangeDutyCycle(0);
         sleep(t)
 
-
 GPIO.cleanup()
+
 
 def main():
     print ("Move forward")
@@ -90,8 +90,6 @@ def main():
     print ("Move Right")
     motor.move(0, -0.5, 2)
     motor.stop()
-
-
 
 
 

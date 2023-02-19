@@ -5,11 +5,12 @@ def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("example_topic")
+    client.subscribe("pibot/distance")
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
+    message = msg.payload.decode(encoding='UTF-8')
+    print (message)
 
 client = mqtt.Client()
 client.on_connect = on_connect
