@@ -120,31 +120,27 @@ def respond():
         speak("Going forward")
         return "forward"
 
-
     # 3: backward
     if there_exists(["backward", "go backward", "go back", "back", "beck"]):
         speak("Going backward")
         return 'backward'
-
 
     # 4: left
     if there_exists(["left", "go left", "turn left"]):
         speak("Turning left")
         return 'left'
 
-
     # 5: right
     if there_exists(["right", "go right", "turn right"]):
         speak("Turning right")
         return 'right'
-
 
     # 6: stop
     if there_exists(["stop", "finish"]):
         speak("Stopping")
         return 'stop'
 
-    # 7: line following
+    # 7: Line following
     if there_exists(["enable line", "line follow"]):
         speak("Enabling line follow")
         return 'line_on'
@@ -153,13 +149,7 @@ def respond():
         speak("Disabling line follow")
         return 'line_off'
 
-    # 8: wait
-    if there_exists(["wait", "hold on"]):
-        speak("waiting")
-        time.sleep(60)
-
-
-    # 9: line following
+    # 8: Obstacle Avoidance
     if there_exists(["enable ultrasonic", "ultrasonic on"]):
         speak("Enabling ultrasonic")
         return 'ultrasonic_on'
@@ -168,6 +158,10 @@ def respond():
         speak("Disabling ultrasonic")
         return 'ultrasonic_off'
 
+    # 9: wait
+    if there_exists(["wait", "hold on"]):
+        speak("waiting")
+        time.sleep(60)
 
     # 10: finish
     if there_exists(["exit", "quit", "goodbye"]):

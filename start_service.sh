@@ -1,10 +1,10 @@
 #!/usr/bin/bash
 
-if ps -ef | egrep -i "/home/eldar/robocar/MotorModuleMqtt.py" | grep -v grep > /dev/null; then
+if ps -ef | egrep -i "/home/eldar/robocar/MotorService.py" | grep -v grep > /dev/null; then
 	echo "MotorModule is running"
 else
     echo "Start MotorModule service"
-    nohup /usr/bin/python3 /home/eldar/robocar/MotorModuleMqtt.py &  
+    nohup /usr/bin/python3 /home/eldar/robocar/MotorService.py &
 fi 
 
 if ps -ef | egrep -i "/home/eldar/robocar/Obstacle_avoidance.py" | grep -v grep > /dev/null; then
@@ -14,9 +14,9 @@ else
     nohup /usr/bin/python3 /home/eldar/robocar/Obstacle_avoidance.py &  
 fi 
 
-if ps -ef | egrep -i "/home/eldar/robocar/IRModule.py" | grep -v grep > /dev/null; then
-	echo "IRModule.py is running"
+if ps -ef | egrep -i "/home/eldar/robocar/Line_Detection.py" | grep -v grep > /dev/null; then
+	echo "Line_Detection.py is running"
 else
-    echo "Start IRModule.py service"
-    nohup /usr/bin/python3 /home/eldar/robocar/IRModule.py &  
+    echo "Start Line_Detection.py service"
+    nohup /usr/bin/python3 /home/eldar/robocar/Line_Detection.py &
 fi 

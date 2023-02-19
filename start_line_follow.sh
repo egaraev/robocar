@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-if ps -ef | egrep -i "/home/eldar/robocar/Line_Follow.py" | grep -v grep > /dev/null; then
-	echo "Line_Follow is running"
+if ps -ef | egrep -i "/home/eldar/robocar/InfraredModule.py" | grep -v grep > /dev/null; then
+	echo "InfraredModule is running"
 else
-    echo "Start Line_Follow service"
-    nohup /usr/bin/python3 /home/eldar/robocar/Line_Follow.py &  
+    echo "Start InfraredModule service"
+    nohup /usr/bin/python3 /home/eldar/robocar/InfraredModule.py &
 fi 
