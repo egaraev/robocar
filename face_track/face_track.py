@@ -3,7 +3,7 @@ import serial,time
 face_cascade= cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 cap=cv2.VideoCapture(0)
 #fourcc= cv2.VideoWriter_fourcc(*'XVID')
-#ArduinoSerial=serial.Serial('com7',9600,timeout=0.1)
+ArduinoSerial=serial.Serial('/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0',9600,timeout=0.1)
 #out= cv2.VideoWriter('face detection4.avi',fourcc,20.0,(640,480))
 time.sleep(1)
 
@@ -17,7 +17,7 @@ while cap.isOpened():
         #sending coordinates to Arduino
         string='X{0:d}Y{1:d}'.format((x+w//2),(y+h//2))
         print(string)
-        #ArduinoSerial.write(string.encode('utf-8'))
+        ArduinoSerial.write(string.encode('utf-8'))
         #plot the center of the face
         cv2.circle(frame,(x+w//2,y+h//2),2,(0,255,0),2)
         #plot the roi

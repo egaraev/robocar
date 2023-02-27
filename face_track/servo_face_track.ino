@@ -6,15 +6,15 @@ int xpos = 90, ypos = 90;  // initial positions of both Servos
 void setup() {
 
   Serial.begin(9600);
-  x.attach(9);
-  y.attach(10);
+  x.attach(14);
+  y.attach(15);
   // Serial.print(width);
   //Serial.print("\t");
   //Serial.println(height);
   x.write(xpos);
   y.write(ypos);
 }
-const int angle = 2;   // degree of increment or decrement
+const int angle = 1;   // degree of increment or decrement
 
 void loop() {
   if (Serial.available() > 0)
@@ -33,9 +33,9 @@ void loop() {
       xpos += angle;
     if (x_mid < width / 2 - 30)
       xpos -= angle;
-    if (y_mid < height / 2 + 30)
+    if (y_mid > height / 2 + 30)
       ypos -= angle;
-    if (y_mid > height / 2 - 30)
+    if (y_mid < height / 2 - 30)
       ypos += angle;
 
 
