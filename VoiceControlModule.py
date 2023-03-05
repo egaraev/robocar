@@ -143,6 +143,10 @@ def respond():
         speak("Stopping")
         return 'stop'
 
+    # 6: stop
+    if there_exists(["stop", "finish"]):
+        speak("Stopping")
+        return 'stop'
 
 
     # 7: finish
@@ -162,3 +166,4 @@ while True:
     message = respond()
     print (message)
     client.publish("pibot/move", str(message), qos=1)
+
