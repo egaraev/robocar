@@ -15,7 +15,10 @@ model = Model('vosk-model')
 recognizer = KaldiRecognizer(model, 16000)
 cap = pyaudio.PyAudio()
 stream = cap.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8192)
+import subprocess, signal
 
+camera = ["python", "VideoStream.py"]
+regular_camera = subprocess.Popen(camera)
 
 
 def check_internet():
@@ -108,6 +111,35 @@ def speak(audio_string):
         print(f"Android: {audio_string}")  # print what app said
 
 
+
+def start_face_tracking_subprocess():
+    # start the subprocess
+    subprocess_args = ["python", "FaceTrackingFunction.py"]
+    face_tracking_obj = subprocess.Popen(subprocess_args)
+    return face_tracking_obj
+
+
+def start_obstacle_avoid_subprocess():
+    # start the subprocess
+    subprocess_args = ["python", "ObstacleAvoidanceFunction.py"]
+    obstacle_avoidance_obj = subprocess.Popen(subprocess_args)
+    return obstacle_avoidance_obj
+
+
+def start_line_follow_subprocess():
+    # start the subprocess
+    subprocess_args = ["python", "LineFollowFunction.py"]
+    line_follow_obj = subprocess.Popen(subprocess_args)
+    return line_follow_obj
+
+
+def start_lane_follow_subprocess():
+    # start the subprocess
+    subprocess_args = ["python", "LaneFollowFunction.py"]
+    lane_follow_obj = subprocess.Popen(subprocess_args)
+    return lane_follow_obj
+
+
 def respond():
     # 1: greeting
     if there_exists(['android']):
@@ -149,7 +181,16 @@ def respond():
         speak("Disabling line follow")
         return 'line_off'
 
-    # 8: Obstacle Avoidance
+    # 8: Lane following
+    if there_exists(["enable lane", "lane follow"]):
+        speak("Enabling lane follow")
+        return 'lane_on'
+
+    if there_exists(["disable lane", "lane unfollow"]):
+        speak("Disabling lane follow")
+        return 'lane_off'
+
+    # 9: Obstacle Avoidance
     if there_exists(["enable ultrasonic", "ultrasonic on"]):
         speak("Enabling ultrasonic")
         return 'ultrasonic_on'
@@ -158,12 +199,21 @@ def respond():
         speak("Disabling ultrasonic")
         return 'ultrasonic_off'
 
-    # 9: wait
+    # 10: Face tracking
+    if there_exists(["face", "face tracking"]):
+        speak("Face tracking")
+        return "face_on"
+
+    if there_exists(["no tracking"]):
+        speak("Stopping Face tracking")
+        return "face_off"
+
+    # 11: wait
     if there_exists(["wait", "hold on"]):
         speak("waiting")
         time.sleep(60)
 
-    # 10: finish
+    # 12: finish
     if there_exists(["exit", "quit", "goodbye"]):
         speak("going offline")
         sys.exit()
@@ -179,9 +229,25 @@ while True:
     voice_data = recognize() # get the voice input
     message = respond()
     print (message)
-    if message=='line_on' or message=='line_off':
-        client.publish("pibot/line", str(message), qos=1)
-    elif message=='ultrasonic_on' or message=='ultrasonic_off':
-        client.publish("pibot/ultrasonic", str(message), qos=1)
+    if message == "face_on":
+        regular_camera.terminate()
+        face_track = start_face_tracking_subprocess()
+    elif message == "face_off":
+        face_track.send_signal(signal.SIGTERM)
+    elif message == "line_on":
+        regular_camera.terminate()
+        line_follow = start_line_follow_subprocess()
+    elif message == "line_off":
+        line_follow.send_signal(signal.SIGTERM)
+    elif message == "ultrasonic_on":
+        regular_camera.terminate()
+        obstacle_avoid = start_obstacle_avoid_subprocess()
+    elif message == "ultrasonic_off":
+        obstacle_avoid.send_signal(signal.SIGTERM)
+    elif message == "lane_on":
+        regular_camera.terminate()
+        lane_follow = start_lane_follow_subprocess()
+    elif message == "lane_off":
+        lane_follow.send_signal(signal.SIGTERM)
     else:
         client.publish("pibot/move", str(message), qos=1)

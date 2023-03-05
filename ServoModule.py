@@ -2,8 +2,8 @@ import serial
 import time
 controller = '/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0'
 
-class ServoController:
-    def __init__(self, serial_port, serial_speed=115200):
+class ServoController():
+    def __init__(self, serial_port, serial_speed=9600):
         self.ser = serial.Serial(serial_port, serial_speed, timeout=1)
         # Wait for Arduino to initialize
         time.sleep(2)
@@ -19,8 +19,8 @@ class ServoController:
 
 
 
-my_controller = ServoController(controller)
-my_controller.servo(120)
-my_controller.servo(70)
-my_controller.servo(180)
-my_controller.servo('middle')
+# my_controller = ServoController(controller)
+# my_controller.servo(120)
+# my_controller.servo(70)
+# my_controller.servo(180)
+# my_controller.servo('middle')

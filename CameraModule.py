@@ -1,14 +1,18 @@
 import cv2
 
-cap = cv2.VideoCapture(0)
+class VideoCapture:
+    def __init__(self, device=0, size=[640,480]):
+        self.cap = cv2.VideoCapture(device)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, size[0])
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, size[1])
 
-def getImg(display=False,size=[480,240]):
-    _, img = cap.read()
-    img = cv2.resize(img,(size[0],size[1]))
-    if display:
-        cv2.imshow('IMG',img)
-    return img
+    def get_frame(self, display=False):
+        _, img = self.cap.read()
+        if display:
+            cv2.imshow('IMG', img)
+        return img
 
 if __name__ == '__main__':
+    vc = VideoCapture()
     while True:
-        img = getImg(True)
+        img = vc.get_frame(True)

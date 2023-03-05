@@ -7,7 +7,7 @@ void setup() {
   // put your setup code here, to run once:
   myServo.attach(14);
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   delay(2000);
 
 }

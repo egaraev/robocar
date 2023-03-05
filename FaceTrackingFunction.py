@@ -2,6 +2,7 @@ import cv2
 import serial,time
 import paho.mqtt.client as mqtt
 from MotorModule import Motor
+from CameraModule import VideoCapture
 motor = Motor(22, 27, 17, 2, 4, 3)
 
 class FaceTracer:
@@ -13,6 +14,7 @@ class FaceTracer:
         self.mqtt_client.on_message = self._on_message
         self.mqtt_client.connect(mqtt_server, mqtt_port, 60)
         self.distance = 0
+        self.video_capture = VideoCapture(size=[640,480])
 
     def _on_connect(self, client, userdata, flags, rc):
         self.mqtt_client.subscribe("pibot/distance")
@@ -21,9 +23,10 @@ class FaceTracer:
         self.distance = float(msg.payload.decode(encoding='UTF-8'))
 
     def trace_faces(self, frame):
-        frame=cv2.flip(frame,1)  #mirror the image
-        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-        faces= self.face_cascade.detectMultiScale(gray,1.1,6)  #detect the face
+        frame = self.video_capture.get_frame()
+        frame = cv2.flip(frame, 1)  # mirror the image
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = self.face_cascade.detectMultiScale(gray, 1.1, 6)  # detect the face
         for x,y,w,h in faces:
             #sending coordinates to Arduino
             string='X{0:d}Y{1:d}'.format((x+w//2),(y+h//2))
@@ -37,9 +40,7 @@ class FaceTracer:
         cv2.rectangle(frame,(640//2-30,480//2-30),
                      (640//2+30,480//2+30),
                       (255,255,255),3)
-        #out.write(frame)
         cv2.imshow('img',frame)
-        #cv2.imwrite('output_img.jpg',frame)
 
         # Get the distance value from MQTT
         self.mqtt_client.loop(timeout=0.01)
@@ -58,18 +59,15 @@ class FaceTracer:
 class MainLoop:
     def __init__(self, face_tracer):
         self.face_tracer = face_tracer
-        self.cap = cv2.VideoCapture(0)
-        time.sleep(1)
 
     def run(self):
-        while self.cap.isOpened():
-            ret, frame = self.cap.read()
-            self.face_tracer.trace_faces(frame)
+        while True:
+            self.face_tracer.trace_faces()
 
             # press q to Quit
             if cv2.waitKey(10)&0xFF== ord('q'):
                 break
-        self.cap.release()
+
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':

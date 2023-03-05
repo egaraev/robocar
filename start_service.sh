@@ -7,16 +7,16 @@ else
     nohup /usr/bin/python3 /home/eldar/robocar/MotorService.py &
 fi 
 
-if ps -ef | egrep -i "/home/eldar/robocar/Obstacle_avoidance.py" | grep -v grep > /dev/null; then
-	echo "Obstacle_avoidance is running"
+if ps -ef | egrep -i "/home/eldar/robocar/UltrasonicSensor.py" | grep -v grep > /dev/null; then
+	echo "UltrasonicSensor is running"
 else
-    echo "Start Obstacle_avoidance service"
-    nohup /usr/bin/python3 /home/eldar/robocar/Obstacle_avoidance.py &  
-fi 
+    echo "Start UltrasonicSensor service"
+    nohup /usr/bin/python3 /home/eldar/robocar/UltrasonicSensor.py &
+fi
 
-if ps -ef | egrep -i "/home/eldar/robocar/Line_Detection.py" | grep -v grep > /dev/null; then
-	echo "Line_Detection.py is running"
+if ps -ef | egrep -i "/home/eldar/robocar/InfraRedSensor.py" | grep -v grep > /dev/null; then
+	echo "InfraRedSensor is running"
 else
-    echo "Start Line_Detection.py service"
-    nohup /usr/bin/python3 /home/eldar/robocar/Line_Detection.py &
-fi 
+    echo "Start InfraRedSensor service"
+    nohup /usr/bin/python3 /home/eldar/robocar/InfraRedSensor.py &
+fi
