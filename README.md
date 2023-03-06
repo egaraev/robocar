@@ -1,5 +1,7 @@
 # robocar
 Repo for robotic car
+![](Robocar.jpg)
+
 
 For joystick
 
