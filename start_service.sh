@@ -20,3 +20,10 @@ else
     echo "Start InfraRedSensor service"
     nohup /usr/bin/python3 /home/eldar/robocar/InfraRedSensor.py &
 fi
+
+if ps -ef | egrep -i "/home/eldar/robocar/ServoService.py" | grep -v grep > /dev/null; then
+	echo "ServoService is running"
+else
+    echo "Start ServoService service"
+    nohup /usr/bin/python3 /home/eldar/robocar/ServoService.py &
+fi
