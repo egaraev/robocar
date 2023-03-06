@@ -38,7 +38,8 @@ def distance():
             distance = pulse_duration * 17150
             avgDistance = round(distance+1.15, 2)
 
-        client.publish("pibot/distance", avgDistance, qos=0)
+        client.publish("pibot/distance", avgDistance)
+        time.sleep(0.5)
 
 
 

@@ -3,13 +3,13 @@ import time
 import paho.mqtt.client as mqtt
 
 
-class ObstacleAvoidance:
+class ObstacleAvoidance():
     def __init__(self):
         self.motor = Motor(22, 27, 17, 2, 4, 3)
         self.client = mqtt.Client()
         self.client.connect("test.mosquitto.org", 1883, 60)
         self.client.on_message = self.on_message
-        self.client.subscribe("pibot/distance")
+        self.client.subscribe("pibot/distance", qos=2)
         time.sleep(2)
         self.count = 0
         self.flag = 0
@@ -17,7 +17,8 @@ class ObstacleAvoidance:
     def on_message(self, client, userdata, message):
         # Convert message payload to string
         message_str = str(message.payload.decode("utf-8"))
-        avgDistance = int(message_str)
+        avgDistance = float(message_str)
+        print (message_str)
 
         if avgDistance <= 25:
             print("Average distance is:", avgDistance, "cm")
@@ -48,5 +49,5 @@ class ObstacleAvoidance:
             self.client.loop()
 
 
-line_follow = ObstacleAvoidance()
-line_follow.start()
+obstacle_avoid = ObstacleAvoidance()
+obstacle_avoid.start()

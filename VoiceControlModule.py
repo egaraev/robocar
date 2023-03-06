@@ -11,13 +11,13 @@ import paho.mqtt.client as mqtt
 import sys
 from vosk import Model, KaldiRecognizer
 import pyaudio
+import cv2
 model = Model('vosk-model')
 recognizer = KaldiRecognizer(model, 16000)
 cap = pyaudio.PyAudio()
 stream = cap.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8192)
 import subprocess, signal
-
-camera = ["python", "VideoStream.py"]
+camera = ["python3", "VideoStream.py"]
 regular_camera = subprocess.Popen(camera)
 
 
@@ -114,28 +114,28 @@ def speak(audio_string):
 
 def start_face_tracking_subprocess():
     # start the subprocess
-    subprocess_args = ["python", "FaceTrackingFunction.py"]
+    subprocess_args = ["python3", "FaceTrackingFunction.py"]
     face_tracking_obj = subprocess.Popen(subprocess_args)
     return face_tracking_obj
 
 
 def start_obstacle_avoid_subprocess():
     # start the subprocess
-    subprocess_args = ["python", "ObstacleAvoidanceFunction.py"]
+    subprocess_args = ["python3", "ObstacleAvoidanceFunction.py"]
     obstacle_avoidance_obj = subprocess.Popen(subprocess_args)
     return obstacle_avoidance_obj
 
 
 def start_line_follow_subprocess():
     # start the subprocess
-    subprocess_args = ["python", "LineFollowFunction.py"]
+    subprocess_args = ["python3", "LineFollowFunction.py"]
     line_follow_obj = subprocess.Popen(subprocess_args)
     return line_follow_obj
 
 
 def start_lane_follow_subprocess():
     # start the subprocess
-    subprocess_args = ["python", "LaneFollowFunction.py"]
+    subprocess_args = ["python3", "LaneFollowFunction.py"]
     lane_follow_obj = subprocess.Popen(subprocess_args)
     return lane_follow_obj
 
@@ -224,30 +224,46 @@ time.sleep(1)
 client = mqtt.Client()
 client.connect("test.mosquitto.org", 1883, 60)
 
+# Define the cleanup function
+def cleanup():
+    regular_camera.terminate()
+    face_track.send_signal(signal.SIGTERM)
+    line_follow.send_signal(signal.SIGTERM)
+    obstacle_avoid.send_signal(signal.SIGTERM)
+    lane_follow.send_signal(signal.SIGTERM)
 
-while True:
-    voice_data = recognize() # get the voice input
-    message = respond()
-    print (message)
-    if message == "face_on":
-        regular_camera.terminate()
-        face_track = start_face_tracking_subprocess()
-    elif message == "face_off":
-        face_track.send_signal(signal.SIGTERM)
-    elif message == "line_on":
-        regular_camera.terminate()
-        line_follow = start_line_follow_subprocess()
-    elif message == "line_off":
-        line_follow.send_signal(signal.SIGTERM)
-    elif message == "ultrasonic_on":
-        regular_camera.terminate()
-        obstacle_avoid = start_obstacle_avoid_subprocess()
-    elif message == "ultrasonic_off":
-        obstacle_avoid.send_signal(signal.SIGTERM)
-    elif message == "lane_on":
-        regular_camera.terminate()
-        lane_follow = start_lane_follow_subprocess()
-    elif message == "lane_off":
-        lane_follow.send_signal(signal.SIGTERM)
-    else:
-        client.publish("pibot/move", str(message), qos=1)
+try:
+    while True:
+        voice_data = recognize() # get the voice input
+        message = respond()
+        print (message)
+        if message == "face_on":
+            regular_camera.terminate()
+            face_track = start_face_tracking_subprocess()
+        elif message == "face_off":
+            face_track.terminate()
+            face_track.send_signal(signal.SIGTERM)
+        elif message == "line_on":
+            regular_camera.terminate()
+            line_follow = start_line_follow_subprocess()
+        elif message == "line_off":
+            line_follow.terminate()
+            line_follow.send_signal(signal.SIGTERM)
+        elif message == "ultrasonic_on":
+            regular_camera.terminate()
+            obstacle_avoid = start_obstacle_avoid_subprocess()
+        elif message == "ultrasonic_off":
+            obstacle_avoid.send_signal(signal.SIGTERM)
+        elif message == "lane_on":
+            regular_camera.terminate()
+            lane_follow = start_lane_follow_subprocess()
+        elif message == "lane_off":
+            lane_follow.terminate()
+            lane_follow.send_signal(signal.SIGTERM)
+        else:
+            client.publish("pibot/move", str(message), qos=1)
+except KeyboardInterrupt:
+    print("Keyboard interrupt detected, cleaning up...")
+    cleanup()
+finally:
+    cleanup()

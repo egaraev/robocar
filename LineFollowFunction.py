@@ -2,7 +2,7 @@ from MotorModule import Motor
 import paho.mqtt.client as mqtt
 
 
-class LineFollow:
+class LineFollow():
     def __init__(self):
         self.motor = Motor(22, 27, 17, 2, 4, 3)
         self.speed = 0.25
@@ -17,6 +17,7 @@ class LineFollow:
     def on_message(self, client, userdata, message):
         # Convert message payload to string
         message_str = str(message.payload.decode("utf-8"))
+        #print (message_str)
 
         # Unpack values from message string
         left_value, central_value, right_value = message_str.split(",")
@@ -25,16 +26,17 @@ class LineFollow:
         left_value = int(left_value)
         central_value = int(central_value)
         right_value = int(right_value)
+        #print (left_value, central_value, right_value)
 
         # Use sensor values to control the robot
-        if right_value and central_value:
-            print("Robot is straying off to the right, move left!")
+        if right_value==1 and central_value==1:
+            #print("Robot is straying off to the right, move left!")
             self.motor.move(self.speed, self.curveVal * self.sens, 0.05)
-        elif left_value and central_value:
-            print("Robot is straying off to the left, move right!")
+        elif left_value==1 and central_value==1:
+            #print("Robot is straying off to the left, move right!")
             self.motor.move(self.speed, -self.curveVal * self.sens, 0.05)
-        elif right_value and left_value:
-            print("Following the line!")
+        elif right_value==1 and left_value==1:
+            #print("Following the line!")
             self.motor.move(self.speed, 0.0, 0.05)
 
     def start(self):
