@@ -17,6 +17,8 @@ void setup() {
 }
 
 const int angle = 1;   // degree of increment or decrement
+unsigned long previousMillis = 0;  // variable to store the previous time
+const long interval = 25;          // interval at which to update the servo
 
 void loop() {
 if (Serial.available() > 0)
@@ -30,15 +32,13 @@ if (Serial.available() > 0)
   }
   else
   {
-    z_angle = Serial.parseInt(); // read Z servo angle
-    // Check if angle is single digit
-    if (Serial.available() > 0 && Serial.peek() != '\n')
-    {
-      // Read and append the next character
-      char nextChar = Serial.read();
-      z_angle = (z_angle * 10) + (nextChar - '0');
-    }
+    String incomingString = Serial.readStringUntil('\n');
+    z_angle = incomingString.toInt(); // read Z servo angle
   }
+
+
+
+  
     /* adjust the servo within the squared region if the coordinates
         is outside it
     */
@@ -67,17 +67,15 @@ if (Serial.available() > 0)
     if (z_angle >= 0 && z_angle <= 180) {
       Serial.print("Going to angle: ");
       Serial.println(z_angle);
-      delay(3000);
+      zState = z.read();
+      int delta = z_angle - zState;
+      int increment = delta > 0 ? 1 : -1;
       while (zState != z_angle) {
-        if (zState < z_angle) {
-          z.write(zState + 1);
-          zState += 1;
-          delay(25);
-        }
-        else {
-          z.write(zState - 1);
-          zState -= 1;
-          delay(25);
+        unsigned long currentMillis = millis();
+        if (currentMillis - previousMillis >= interval) {
+          previousMillis = currentMillis;
+          zState += increment;
+          z.write(zState);
         }
       }
     }

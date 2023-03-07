@@ -31,7 +31,7 @@ class FaceTracer:
             #sending coordinates to Arduino
             string='X{0:d}Y{1:d}'.format((x+w//2),(y+h//2))
             #print(string)
-            self.mqtt_client.publish("pibot/servoxy", string)
+            self.mqtt_client.publish("pibot/servo", string)
             ##This is to send coordinates directly to arduino
             #self.ser.write(string.encode('utf-8'))
             ##This is to send coordinates directly to arduino
