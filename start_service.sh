@@ -21,9 +21,9 @@ else
     nohup /usr/bin/python3 /home/eldar/robocar/InfraRedSensor.py &
 fi
 
-if ps -ef | egrep -i "/home/eldar/robocar/ServoService.py" | grep -v grep > /dev/null; then
-	echo "ServoService is running"
+if ps -ef | egrep -i "/home/eldar/robocar/ServoModuleService.py" | grep -v grep > /dev/null; then
+	echo "ServoModuleService is running"
 else
-    echo "Start ServoService service"
-    nohup /usr/bin/python3 /home/eldar/robocar/ServoService.py &
+    echo "Start ServoModuleService service"
+    nohup /usr/bin/python3 /home/eldar/robocar/ServoModuleService.py &
 fi

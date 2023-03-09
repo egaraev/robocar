@@ -1,7 +1,6 @@
 import serial, re
 import paho.mqtt.client as mqtt
-from ServoModule import ServoController
-import time, signal
+import time, signal, sys
 
 serial_controller = '/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0'
 ser = serial.Serial(serial_controller, 9600, timeout=0.1)
