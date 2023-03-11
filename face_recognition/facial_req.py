@@ -9,6 +9,7 @@ import pickle
 import time
 import cv2
 
+
 #Initialize 'currentname' to trigger only when a new person is identified.
 currentname = "unknown"
 #Determine faces from encodings.pickle file model created from train_model.py
@@ -35,12 +36,16 @@ while True:
 	# grab the frame from the threaded video stream and resize it
 	# to 500px (to speedup processing)
 	frame = vs.read()
+
 	frame = imutils.resize(frame, width=500)
 	# Detect the fce boxes
 	boxes = face_recognition.face_locations(frame)
 	# compute the facial embeddings for each face bounding box
+    # update the FPS counter
+	fps.update()
 	encodings = face_recognition.face_encodings(frame, boxes)
 	names = []
+
 
 	# loop over the facial embeddings
 	for encoding in encodings:
@@ -85,6 +90,7 @@ while True:
 		y = top - 15 if top - 15 > 15 else top + 15
 		cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX,
 			.8, (0, 255, 255), 2)
+	#cv2.putText(frame, "FPS: {:.2f}".format(fps.fps()), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
 	# display the image to our screen
 	cv2.imshow("Facial Recognition is Running", frame)
@@ -94,8 +100,6 @@ while True:
 	if key == ord("q"):
 		break
 
-	# update the FPS counter
-	fps.update()
 
 # stop the timer and display FPS information
 fps.stop()
