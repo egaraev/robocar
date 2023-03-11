@@ -48,16 +48,16 @@ class FaceTracer:
         # Get the distance value from MQTT
         self.mqtt_client.loop(timeout=0.01)
         # Check if distance is not zero and print it
-#        if self.distance != 0:
-#            print(self.distance)
-#            if self.distance>100.0:
-#                print ("Moving forward")
-#                motor.move(0.3, 0.0, 0.1)
-#            elif self.distance<50.0:
-#                print ("Moving backward")
-#                motor.backward(0.3, 0.1)
-#            else:
-#                motor.stop()
+        if self.distance != 0:
+            print(self.distance)
+            if self.distance>100.0:
+                print ("Moving forward")
+                motor.move(0.3, 0.0, 0.1)
+            elif self.distance<50.0:
+                print ("Moving backward")
+                motor.backward(0.3, 0.1)
+            else:
+                motor.stop()
 
 
 class MainLoop:
