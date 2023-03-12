@@ -1,0 +1,11 @@
+coral (2.0.0) stable; urgency=medium
+
+  * pycoral grouper release
+
+ -- Coral <coral-support@google.com>  Mon, 28 Jun 2021 14:20:28 -0700
+
+coral (1.0) stable; urgency=medium
+
+  * pycoral initial release
+
+ -- Coral <coral-support@google.com>  Thu, 22 Oct 2020 18:12:17 -0700
