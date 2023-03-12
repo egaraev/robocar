@@ -16,12 +16,11 @@ fps = FPS().start()
 
 # Add a counter and set the skip value
 counter = 0
-skip_frames = 20
+skip_frames = 40
 
 while True:
     frame = vs.read()
-
-    frame = imutils.resize(frame, width=500)
+    frame = imutils.resize(frame, width=400)
     boxes = face_recognition.face_locations(frame)
     fps.update()
     #prev_names =[]
