@@ -8,7 +8,7 @@ Board using the Coral Camera or a webcam. For all settings other than the Coral 
 USB/PCIe/M.2 Accelerator.
 
 
-## Set up your device
+# Set up your device
 
 1.  First, be sure you have completed the [setup instructions for your Coral
     device](https://coral.ai/docs/setup/). If it's been a while, repeat to be sure
