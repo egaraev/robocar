@@ -1,6 +1,6 @@
 import cv2
 
-name = 'Eldar'
+name = 'Elina'
 
 cam = cv2.VideoCapture(0)
 
