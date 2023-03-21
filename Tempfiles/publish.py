@@ -1,11 +1,11 @@
 import paho.mqtt.client as mqtt
 
-message = "forward"
+message = "0"
 
 # The callback for when the client successfully connects to the broker
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    client.publish("pibot/move", message, qos=1)
+    client.publish("pibot/servo", message, qos=1)
 
 client = mqtt.Client()
 client.on_connect = on_connect
