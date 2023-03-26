@@ -6,7 +6,7 @@ import math
 curveList = []
 wT = 0
 avgVal = 10
-
+curr_steering_angle = 0
 
 
 def display_heading_line(frame, curve, line_color=(0, 0, 255), line_width=5):
@@ -121,6 +121,7 @@ def region_of_interest(image):
     return masked_image
 
 def getLineCurve(frame):
+    global curr_steering_angle
     height, width, _ = frame.shape
     wT = width
     canny_image = canny(frame)
@@ -134,9 +135,15 @@ def getLineCurve(frame):
         curveList.append(curveRaw)
         if len(curveList) > avgVal:
             curveList.pop(0)
-        curve = (sum(curveList) / len(curveList))*100
+        normal_angle = (sum(curveList) / len(curveList))*100
     else:
-        curve = 0
+        normal_angle = 0
+
+    # Add this block of code to call the stabilize_steering_angle function
+    num_of_lane_lines = len(averaged_lines) if averaged_lines is not None else 0
+    stabilized_angle = stabilize_steering_angle(curr_steering_angle, normal_angle, num_of_lane_lines)
+    curve = stabilized_angle
+    curr_steering_angle = stabilized_angle
 
     imgResult = frame
     midY = 450
@@ -144,6 +151,7 @@ def getLineCurve(frame):
     elif curve < -0.5: direction = "<--"
     else: direction = "^"
     curve = curve/100
+    normal_angle = (sum(curveList) / len(curveList)) * 100
     cv2.putText(imgResult,  str(int(curve*1000)) + direction, (wT // 2 - 80, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
     cv2.line(imgResult, (wT // 2, midY), (wT // 2 + (int(curve) * 3), midY), (255, 0, 255), 5)
     cv2.line(imgResult, ((wT // 2 + (int(curve) * 3)), midY - 25), (wT // 2 + (int(curve) * 3), midY + 25), (0, 255, 0), 5)
@@ -151,11 +159,31 @@ def getLineCurve(frame):
         w = wT // 20
         cv2.line(imgResult, (w * x + int(curve // 50), midY - 10),
                  (w * x + int(curve // 50), midY + 10), (0, 0, 255), 2)
+    #cv2.putText(imgResult, 'Normal Angle: ' + str(int(normal_angle)), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+    #cv2.putText(imgResult, 'Stabilized Angle: ' + str(int(stabilized_angle)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+
     combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
     combo_image = display_heading_line(combo_image, curve)
     cv2.imshow("result", combo_image)
 
     return curve
+
+def stabilize_steering_angle(curr_steering_angle, new_steering_angle, num_of_lane_lines, max_angle_deviation_two_lines=4, max_angle_deviation_one_lane=0.5):
+    if num_of_lane_lines == 2 :
+        # if both lane lines detected, then we can deviate more
+        max_angle_deviation = max_angle_deviation_two_lines
+    else:
+        # if only one lane detected, don't deviate too much
+        max_angle_deviation = max_angle_deviation_one_lane
+
+    angle_deviation = new_steering_angle - curr_steering_angle
+    if abs(angle_deviation) > max_angle_deviation:
+        stabilized_steering_angle = int(curr_steering_angle
+                                        + max_angle_deviation * angle_deviation / abs(angle_deviation))
+    else:
+        stabilized_steering_angle = new_steering_angle
+    #print('Proposed angle: %s, stabilized angle: %s' % (new_steering_angle, stabilized_steering_angle))
+    return stabilized_steering_angle
 
 
 def main():
@@ -164,17 +192,13 @@ def main():
     cap = cv2.VideoCapture(0)  # Open the default camera, set it to 1 or 2 if you have multiple cameras
     while True:
         ret, frame = cap.read()  # Read a frame from the camera
-
         if not ret:
             print("Failed to capture frame. Exiting.")
             break
-
         getLineCurve(frame)
-
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):  # Press "q" to exit the loop
             break
-
     cap.release()
     cv2.destroyAllWindows()
 
