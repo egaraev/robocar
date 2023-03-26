@@ -120,7 +120,7 @@ def region_of_interest(image):
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
 
-def getLaneCurve(img, wT, averaged_lines):
+def getLineCurve(img, wT, averaged_lines):
     global curveList
     curveRaw = compute_steering_angle(img, averaged_lines)
     curveList.append(curveRaw)
@@ -164,11 +164,9 @@ def main():
         averaged_lines = average_slope_intercept(frame, lines)
         line_image = display_lines(frame, averaged_lines)
         combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
-
-
         if averaged_lines is not None:
             steering_angle = compute_steering_angle(frame, averaged_lines)
-            curve = getLaneCurve(combo_image, wT, averaged_lines)
+            curve = getLineCurve(combo_image, wT, averaged_lines)
             combo_image = display_heading_line(combo_image, steering_angle)
 
         cv2.imshow("result", combo_image)

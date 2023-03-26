@@ -60,7 +60,7 @@ def getLaneCurve(img, display=2):
                                              [imgHist, imgWarp, imgResult]))
         cv2.imshow('ImageStack', imgStacked)
     elif display == 1:
-        cv2.imshow('Resutlt', imgResult)
+        cv2.imshow('Result', imgResult)
 
     #### NORMALIZATION
     curve = curve / 100
