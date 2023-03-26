@@ -3,6 +3,11 @@ import numpy as np
 import warnings
 from numpy import RankWarning
 import math
+curveList = []
+wT = 0
+avgVal = 10
+
+
 
 def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_width=5):
     heading_image = np.zeros_like(frame)
@@ -22,7 +27,7 @@ def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wid
 def compute_steering_angle(frame, lane_lines):
     if len(lane_lines) == 0:
         print('No lane lines detected, do nothing')
-        return -90
+        return 0
 
     height, width, _ = frame.shape
     if len(lane_lines) == 1:
@@ -43,7 +48,11 @@ def compute_steering_angle(frame, lane_lines):
     steering_angle = angle_to_mid_deg + 90
 
     print('New steering angle: %s' % steering_angle)
-    return steering_angle
+
+    # Normalize steering angle to a value between -1 and 1
+    curve_value = steering_angle / 180 - 1
+    return curve_value
+
 
 def make_points(image, line):
     slope, intercept = line
@@ -107,6 +116,35 @@ def region_of_interest(image):
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
 
+def getLaneCurve(img, wT, averaged_lines, display=2):
+    global curveList
+    curveRaw = compute_steering_angle(img, averaged_lines)
+    curveList.append(curveRaw)
+    if len(curveList) > avgVal:
+        curveList.pop(0)
+    curve = int(sum(curveList) / len(curveList))
+
+    if display != 0:
+        imgResult = img
+        midY = 450
+        if curve > 5: direction = "-->"
+        elif curve < -5: direction = "<--"
+        else: direction = "^"
+        cv2.putText(imgResult, str(curve) + direction, (wT // 2 - 80, 85), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 0, 255), 3)
+        cv2.line(imgResult, (wT // 2, midY), (wT // 2 + (curve * 3), midY), (255, 0, 255), 5)
+        cv2.line(imgResult, ((wT // 2 + (curve * 3)), midY - 25), (wT // 2 + (curve * 3), midY + 25), (0, 255, 0), 5)
+        for x in range(-30, 30):
+            w = wT // 20
+            cv2.line(imgResult, (w * x + int(curve // 50), midY - 10),
+                     (w * x + int(curve // 50), midY + 10), (0, 0, 255), 2)
+    #### NORMALIZATION
+    curve = curve / 100
+    if curve > 1: curve = 1
+    if curve < -1: curve = -1
+
+    return curve
+
+
 
 
 def main():
@@ -120,7 +158,8 @@ def main():
         if not ret:
             print("Failed to capture frame. Exiting.")
             break
-
+        height, width, _ = frame.shape
+        wT = width
         canny_image = canny(frame)
         cropped_image = region_of_interest(canny_image)
         lines = cv2.HoughLinesP(cropped_image, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=7)
@@ -129,8 +168,9 @@ def main():
         combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
 
         if averaged_lines is not None:
-            steering_angle = compute_steering_angle(frame, averaged_lines)  # Pass 'frame' instead of 'lane_image'
+            steering_angle = compute_steering_angle(frame, averaged_lines)
             print("Steering Angle:", steering_angle)
+            curve = getLaneCurve(combo_image, wT, averaged_lines)
             combo_image = display_heading_line(combo_image, steering_angle)
 
         cv2.imshow("result", combo_image)
