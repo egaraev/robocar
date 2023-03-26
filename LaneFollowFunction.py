@@ -38,7 +38,8 @@ class LaneFollow:
             img = self.video.get_frame()
             curve_val = getLaneCurve(img, 2)
             line_curve_val = getLineCurve(img)
-            line_curve_val = round(line_curve_val*10, 2)
+            line_curve_val = round(line_curve_val, 2)
+            average_curve_val = (curve_val +line_curve_val)/2
 
             if curve_val > self.max_speed:
                 curve_val = self.max_speed
@@ -47,16 +48,17 @@ class LaneFollow:
 
             print("Curve value", curve_val)
             print("Line curve value", line_curve_val)
+            print("Average curve value", average_curve_val)
 
-            if curve_val > 0:
+            if average_curve_val > 0:
                 self.sensitivity = 1.7
-                if curve_val < 0.05:
-                    curve_val = 0
+                if average_curve_val < 0.05:
+                    average_curve_val = 0
             else:
-                if curve_val > -0.05:
-                    curve_val = 0
+                if average_curve_val > -0.05:
+                    average_curve_val = 0
 
-            self.motor.move(0.22, -curve_val * self.sensitivity, 0.05)
+            self.motor.move(0.6, -average_curve_val * self.sensitivity, 0.05)
 
             cv2.waitKey(1)
 

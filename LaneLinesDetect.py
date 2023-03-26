@@ -76,7 +76,7 @@ def average_slope_intercept(image, lines):
             fit = np.polyfit((x1, x2), (y1, y2), 1)
             slope = fit[0]
             intercept = fit[1]
-            min_slope_threshold = 0.5  # Adjust this value based on your input image
+            min_slope_threshold = 0.3  # Adjust this value based on your input image
             if abs(slope) > min_slope_threshold:
                 if slope < 0:  # y is reversed in image
                     left_fit.append((slope, intercept))
@@ -112,13 +112,16 @@ def display_lines (image, lines):
 
 def region_of_interest(image):
     height = image.shape[0]
+    width = image.shape[1]
     polygons = np.array([[
-        (0, height), (950, height), (475, 200)
+        (0, height), (width // 2, 0), (width, height)
     ]])
     mask = np.zeros_like(image)
     cv2.fillPoly(mask, polygons, 255)
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
+
+
 
 def getLineCurve(frame):
     global curr_steering_angle
@@ -147,12 +150,12 @@ def getLineCurve(frame):
 
     imgResult = frame
     midY = 450
-    if curve > 0.5: direction = "-->"
-    elif curve < -0.5: direction = "<--"
+    if curve > 5: direction = "-->"
+    elif curve < -5: direction = "<--"
     else: direction = "^"
     curve = curve/100
     normal_angle = (sum(curveList) / len(curveList)) * 100
-    cv2.putText(imgResult,  str(int(curve*1000)) + direction, (wT // 2 - 80, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+    cv2.putText(imgResult,  str(int(curve*100)) + direction, (wT // 2 - 80, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
     cv2.line(imgResult, (wT // 2, midY), (wT // 2 + (int(curve) * 3), midY), (255, 0, 255), 5)
     cv2.line(imgResult, ((wT // 2 + (int(curve) * 3)), midY - 25), (wT // 2 + (int(curve) * 3), midY + 25), (0, 255, 0), 5)
     for x in range(-30, 30):
@@ -164,6 +167,7 @@ def getLineCurve(frame):
 
     combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
     combo_image = display_heading_line(combo_image, curve)
+    #cv2.imshow("result", region_of_interest(frame))
     cv2.imshow("result", combo_image)
 
     return curve
