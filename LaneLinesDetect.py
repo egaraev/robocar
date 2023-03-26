@@ -120,27 +120,40 @@ def region_of_interest(image):
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
 
-def getLineCurve(img, wT, averaged_lines):
-    global curveList
-    curveRaw = compute_steering_angle(img, averaged_lines)
-    curveList.append(curveRaw)
-    if len(curveList) > avgVal:
-        curveList.pop(0)
-    curve = (sum(curveList) / len(curveList))*100
-    imgResult = img
+def getLineCurve(frame):
+    height, width, _ = frame.shape
+    wT = width
+    canny_image = canny(frame)
+    cropped_image = region_of_interest(canny_image)
+    lines = cv2.HoughLinesP(cropped_image, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=7)
+    averaged_lines = average_slope_intercept(frame, lines)
+    line_image = display_lines(frame, averaged_lines)
+
+    if averaged_lines is not None:
+        curveRaw = compute_steering_angle(frame, averaged_lines)
+        curveList.append(curveRaw)
+        if len(curveList) > avgVal:
+            curveList.pop(0)
+        curve = (sum(curveList) / len(curveList))*100
+    else:
+        curve = 0
+
+    imgResult = frame
     midY = 450
-    if curve > 5: direction = "-->"
-    elif curve < -5: direction = "<--"
+    if curve > 0.5: direction = "-->"
+    elif curve < -0.5: direction = "<--"
     else: direction = "^"
     curve = curve/100
-    cv2.putText(imgResult,  str(round(curve*90, 2)) + direction, (wT // 2 - 80, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+    cv2.putText(imgResult,  str(int(curve*1000)) + direction, (wT // 2 - 80, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
     cv2.line(imgResult, (wT // 2, midY), (wT // 2 + (int(curve) * 3), midY), (255, 0, 255), 5)
     cv2.line(imgResult, ((wT // 2 + (int(curve) * 3)), midY - 25), (wT // 2 + (int(curve) * 3), midY + 25), (0, 255, 0), 5)
     for x in range(-30, 30):
         w = wT // 20
         cv2.line(imgResult, (w * x + int(curve // 50), midY - 10),
                  (w * x + int(curve // 50), midY + 10), (0, 0, 255), 2)
-
+    combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
+    combo_image = display_heading_line(combo_image, curve)
+    cv2.imshow("result", combo_image)
 
     return curve
 
@@ -149,28 +162,14 @@ def main():
     # Ignore RankWarning
     warnings.simplefilter("ignore", RankWarning)
     cap = cv2.VideoCapture(0)  # Open the default camera, set it to 1 or 2 if you have multiple cameras
-
     while True:
         ret, frame = cap.read()  # Read a frame from the camera
 
         if not ret:
             print("Failed to capture frame. Exiting.")
             break
-        height, width, _ = frame.shape
-        wT = width
-        canny_image = canny(frame)
-        cropped_image = region_of_interest(canny_image)
-        lines = cv2.HoughLinesP(cropped_image, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=7)
-        averaged_lines = average_slope_intercept(frame, lines)
-        line_image = display_lines(frame, averaged_lines)
-        combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
-        if averaged_lines is not None:
-            steering_angle = compute_steering_angle(frame, averaged_lines)
-            curve = getLineCurve(combo_image, wT, averaged_lines)
-            combo_image = display_heading_line(combo_image, steering_angle)
 
-        cv2.imshow("result", combo_image)
-        #cv2.imshow("canny", canny_image)
+        getLineCurve(frame)
 
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):  # Press "q" to exit the loop

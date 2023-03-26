@@ -38,6 +38,7 @@ class LaneFollow:
             img = self.video.get_frame()
             curve_val = getLaneCurve(img, 2)
             line_curve_val = getLineCurve(img)
+            line_curve_val = round(line_curve_val*10, 2)
 
             if curve_val > self.max_speed:
                 curve_val = self.max_speed
