@@ -111,16 +111,16 @@ try:
                 break
             elif moveLeft:
                 print ("Moving left")
-                motor.move(0, 0.7, 0.1)
+                motor.move(0, 0.9, 0.1)
             elif moveRight:
                 print ("Moving right")
-                motor.move(0, -0.7, 0.1)
+                motor.move(0, -0.9, 0.1)
             elif moveUp:
                 print ("Moving forward")
-                motor.move(0.3, 0.0, 0.1)
+                motor.move(0.7, 0.0, 0.1)
             elif moveDown:
                 print ("Moving backward")
-                motor.backward(0.3, 0.1)
+                motor.backward(0.7, 0.1)
             else:
                 print ("Slowing down")
                 motor.stop()

@@ -9,7 +9,12 @@ clientName = "PiBot"
 client = mqtt.Client()
 didPrintSubscribeMessage = False
 
-
+def reset_arduino_connection(ser):
+    print("Resetting Arduino connection...")
+    ser.close()  # Close the current serial connection
+    time.sleep(5)  # Wait for 1 second to ensure the connection is closed
+    ser.open()  # Reopen the serial connection
+    print("Arduino connection reset")
 
 def connectionStatus(client, userdata, flags, rc):
     global didPrintSubscribeMessage
@@ -25,6 +30,8 @@ def messageDecoder(client, userdata, msg):
     print (message)
     if re.match(r'X\d+Y\d+', message):
         ser.write(message.encode('utf-8'))
+    elif message == "RESET":
+        reset_arduino_connection(ser)
     else:
         message = f"Z{message}\n"
         ser.write(message.encode('utf-8'))

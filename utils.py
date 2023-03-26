@@ -32,7 +32,7 @@ def nothing(a):
     pass
 
 
-def initializeTrackbars(intialTracbarVals, wT=480, hT=240):
+def initializeTrackbars(intialTracbarVals, wT=640, hT=480):
     cv2.namedWindow("Trackbars")
     cv2.resizeWindow("Trackbars", 360, 240)
     cv2.createTrackbar("Width Top", "Trackbars", intialTracbarVals[0], wT // 2, nothing)
@@ -51,7 +51,7 @@ def colorpickupTrackbars(initialColorVals):
     cv2.createTrackbar("VALUE Max","HSV",initialColorVals[5],255,nothing)
 
 
-def valTrackbars(wT=480, hT=240):
+def valTrackbars(wT=640, hT=480):
     widthTop = cv2.getTrackbarPos("Width Top", "Trackbars")
     heightTop = cv2.getTrackbarPos("Height Top", "Trackbars")
     widthBottom = cv2.getTrackbarPos("Width Bottom", "Trackbars")

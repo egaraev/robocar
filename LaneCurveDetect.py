@@ -4,8 +4,8 @@ import utils
 
 curveList = []
 avgVal = 10
-initialTrackBarVals = [92,123,0,215]
-initialColorVals = [85, 0, 110, 179, 255, 160]
+initialTrackBarVals = [131,310,18,458]
+initialColorVals = [0, 0, 0, 179, 255, 74]
 utils.initializeTrackbars(initialTrackBarVals)
 utils.colorpickupTrackbars(initialColorVals)
 
