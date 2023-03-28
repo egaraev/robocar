@@ -8,7 +8,7 @@ then
 		echo "Joystick is running"
 	else
 	    echo "Start jopystick service"
-   	    nohup /usr/bin/python3 /home/eldar/robocar/JoystickModule.py &  
+   	    #nohup /usr/bin/python3 /home/eldar/robocar/JoystickModule.py &  
 	fi 
 else 
     echo "$FILE does not exist."

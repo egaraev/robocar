@@ -24,6 +24,9 @@ class Motor():
         self.pwmB = GPIO.PWM(self.EnaB, 100);
         self.pwmB.start(0);
 
+    def cleanup(self):
+        GPIO.cleanup()
+
     def move(self, speed=0.5, turn=0.0, t=0):
         speed *= 100
         turn *= 70
