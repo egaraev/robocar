@@ -6,7 +6,7 @@ import math
 curveList = []
 wT = 0
 avgVal = 10
-
+curr_steering_angle = 0
 
 
 def display_heading_line(frame, curve, line_color=(0, 0, 255), line_width=5):
@@ -76,7 +76,7 @@ def average_slope_intercept(image, lines):
             fit = np.polyfit((x1, x2), (y1, y2), 1)
             slope = fit[0]
             intercept = fit[1]
-            min_slope_threshold = 0.5  # Adjust this value based on your input image
+            min_slope_threshold = 0.3  # Adjust this value based on your input image
             if abs(slope) > min_slope_threshold:
                 if slope < 0:  # y is reversed in image
                     left_fit.append((slope, intercept))
@@ -112,72 +112,97 @@ def display_lines (image, lines):
 
 def region_of_interest(image):
     height = image.shape[0]
+    width = image.shape[1]
     polygons = np.array([[
-        (0, height), (950, height), (475, 200)
+        (0, height), (width // 2, 0), (width, height)
     ]])
     mask = np.zeros_like(image)
     cv2.fillPoly(mask, polygons, 255)
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
 
-def getLaneCurve(img, wT, averaged_lines):
-    global curveList
-    curveRaw = compute_steering_angle(img, averaged_lines)
-    curveList.append(curveRaw)
-    if len(curveList) > avgVal:
-        curveList.pop(0)
-    curve = (sum(curveList) / len(curveList))*100
-    imgResult = img
+
+
+def getLineCurve(frame):
+    global curr_steering_angle
+    height, width, _ = frame.shape
+    wT = width
+    canny_image = canny(frame)
+    cropped_image = region_of_interest(canny_image)
+    lines = cv2.HoughLinesP(cropped_image, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=7)
+    averaged_lines = average_slope_intercept(frame, lines)
+    line_image = display_lines(frame, averaged_lines)
+
+    if averaged_lines is not None:
+        curveRaw = compute_steering_angle(frame, averaged_lines)
+        curveList.append(curveRaw)
+        if len(curveList) > avgVal:
+            curveList.pop(0)
+        normal_angle = (sum(curveList) / len(curveList))*100
+    else:
+        normal_angle = 0
+
+    # Add this block of code to call the stabilize_steering_angle function
+    num_of_lane_lines = len(averaged_lines) if averaged_lines is not None else 0
+    stabilized_angle = stabilize_steering_angle(curr_steering_angle, normal_angle, num_of_lane_lines)
+    curve = stabilized_angle
+    curr_steering_angle = stabilized_angle
+
+    imgResult = frame
     midY = 450
     if curve > 5: direction = "-->"
     elif curve < -5: direction = "<--"
     else: direction = "^"
     curve = curve/100
-    cv2.putText(imgResult,  str(round(curve*90, 2)) + direction, (wT // 2 - 80, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+    normal_angle = (sum(curveList) / len(curveList)) * 100
+    cv2.putText(imgResult,  str(int(curve*100)) + direction, (wT // 2 - 80, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
     cv2.line(imgResult, (wT // 2, midY), (wT // 2 + (int(curve) * 3), midY), (255, 0, 255), 5)
     cv2.line(imgResult, ((wT // 2 + (int(curve) * 3)), midY - 25), (wT // 2 + (int(curve) * 3), midY + 25), (0, 255, 0), 5)
     for x in range(-30, 30):
         w = wT // 20
         cv2.line(imgResult, (w * x + int(curve // 50), midY - 10),
                  (w * x + int(curve // 50), midY + 10), (0, 0, 255), 2)
+    #cv2.putText(imgResult, 'Normal Angle: ' + str(int(normal_angle)), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+    #cv2.putText(imgResult, 'Stabilized Angle: ' + str(int(stabilized_angle)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
 
+    combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
+    combo_image = display_heading_line(combo_image, curve)
+    #cv2.imshow("result", region_of_interest(frame))
+    cv2.imshow("result", combo_image)
 
     return curve
+
+def stabilize_steering_angle(curr_steering_angle, new_steering_angle, num_of_lane_lines, max_angle_deviation_two_lines=4, max_angle_deviation_one_lane=0.5):
+    if num_of_lane_lines == 2 :
+        # if both lane lines detected, then we can deviate more
+        max_angle_deviation = max_angle_deviation_two_lines
+    else:
+        # if only one lane detected, don't deviate too much
+        max_angle_deviation = max_angle_deviation_one_lane
+
+    angle_deviation = new_steering_angle - curr_steering_angle
+    if abs(angle_deviation) > max_angle_deviation:
+        stabilized_steering_angle = int(curr_steering_angle
+                                        + max_angle_deviation * angle_deviation / abs(angle_deviation))
+    else:
+        stabilized_steering_angle = new_steering_angle
+    #print('Proposed angle: %s, stabilized angle: %s' % (new_steering_angle, stabilized_steering_angle))
+    return stabilized_steering_angle
 
 
 def main():
     # Ignore RankWarning
     warnings.simplefilter("ignore", RankWarning)
     cap = cv2.VideoCapture(0)  # Open the default camera, set it to 1 or 2 if you have multiple cameras
-
     while True:
         ret, frame = cap.read()  # Read a frame from the camera
-
         if not ret:
             print("Failed to capture frame. Exiting.")
             break
-        height, width, _ = frame.shape
-        wT = width
-        canny_image = canny(frame)
-        cropped_image = region_of_interest(canny_image)
-        lines = cv2.HoughLinesP(cropped_image, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=7)
-        averaged_lines = average_slope_intercept(frame, lines)
-        line_image = display_lines(frame, averaged_lines)
-        combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
-
-
-        if averaged_lines is not None:
-            steering_angle = compute_steering_angle(frame, averaged_lines)
-            curve = getLaneCurve(combo_image, wT, averaged_lines)
-            combo_image = display_heading_line(combo_image, steering_angle)
-
-        cv2.imshow("result", combo_image)
-        #cv2.imshow("canny", canny_image)
-
+        getLineCurve(frame)
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):  # Press "q" to exit the loop
             break
-
     cap.release()
     cv2.destroyAllWindows()
 
