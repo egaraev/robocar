@@ -78,8 +78,8 @@ def PygameHandler(events):
                 moveShare = False
         elif event.type == pygame.JOYAXISMOTION:
             hadEvent = True
-            upDown = joystick.get_axis(axisUpDown)*0.5
-            leftRight = joystick.get_axis(axisLeftRight)*0.5
+            upDown = joystick.get_axis(axisUpDown)
+            leftRight = joystick.get_axis(axisLeftRight)
 
             if axisUpDownInverted:
                 upDown = -upDown
