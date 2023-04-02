@@ -6,7 +6,7 @@ import cv2
 from time import sleep
 import pandas as pd
 
-maxThrottle = 0.25
+maxThrottle = 1.0
 motor = mM.Motor(22, 27, 17, 2, 4, 3)
 
 record = 0

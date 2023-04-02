@@ -27,7 +27,7 @@ class Motor():
     def cleanup(self):
         GPIO.cleanup()
 
-    def move(self, speed=0.5, turn=0.0, t=0):
+    def move(self, speed=1.0, turn=0.0, t=0):
         speed *= 100
         turn *= 70
         leftSpeed = speed - turn
