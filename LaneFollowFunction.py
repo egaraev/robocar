@@ -36,8 +36,9 @@ class LaneFollow:
 #            time.sleep(0.1)  # Adjust the sleep time as needed
         while True:
             img = self.video.get_frame()
-            curve_val = getLaneCurve(img, 2)
-            line_curve_val = getLineCurve(img)
+            curve_val = getLaneCurve(img, 1)
+            #line_curve_val = getLineCurve(img)
+            line_curve_val = 0
             line_curve_val = round(line_curve_val, 2)
             average_curve_val = (curve_val +line_curve_val)/2
 
@@ -58,7 +59,7 @@ class LaneFollow:
                 if average_curve_val > -0.05:
                     average_curve_val = 0
 
-            self.motor.move(0.6, -average_curve_val * self.sensitivity, 0.05)
+            self.motor.move(0.3, -average_curve_val * self.sensitivity, 0.05)
 
             cv2.waitKey(1)
 

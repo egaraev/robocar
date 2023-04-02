@@ -5,7 +5,6 @@ colorama
 log-symbols
 spinners
 imutils
-Cmake
 face-recognition
 absl-py==0.15.0
 astunparse==1.6.3
