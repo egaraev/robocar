@@ -83,6 +83,7 @@ def main():
         default="",
     )
 
+
     args = parser.parse_args()
 
     if args.inputDir is None:
