@@ -1,7 +1,7 @@
 <annotation>
-	<folder>captured_images</folder>
+	<folder>test</folder>
 	<filename>20230407_181240.jpg</filename>
-	<path>D:\repo\robocar\Tempfiles\captured_images\20230407_181240.jpg</path>
+	<path>D:\repo\robocar\models\object_detection\data\images\test\20230407_181240.jpg</path>
 	<source>
 		<database>Unknown</database>
 	</source>
@@ -72,18 +72,6 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>person</name>
-		<pose>Unspecified</pose>
-		<truncated>0</truncated>
-		<difficult>0</difficult>
-		<bndbox>
-			<xmin>307</xmin>
-			<ymin>295</ymin>
-			<xmax>342</xmax>
-			<ymax>356</ymax>
-		</bndbox>
-	</object>
-	<object>
 		<name>stop</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
@@ -129,6 +117,18 @@
 			<ymin>331</ymin>
 			<xmax>578</xmax>
 			<ymax>416</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>second person</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>305</xmin>
+			<ymin>292</ymin>
+			<xmax>345</xmax>
+			<ymax>357</ymax>
 		</bndbox>
 	</object>
 </annotation>
