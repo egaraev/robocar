@@ -26,4 +26,4 @@ def save_image_with_timestamp(img, folder):
 if __name__ == '__main__':
     vc = VideoCapture()
     img = vc.get_frame()
-    save_image_with_timestamp(img, "captured_images")
+    save_image_with_timestamp(img, "new_images")
