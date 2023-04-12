@@ -1,0 +1,10 @@
+green light
+limit 30
+limit 50
+pedestrian sign
+person
+red light
+round
+second person
+stop
+traffic light sign
