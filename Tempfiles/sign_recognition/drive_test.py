@@ -60,13 +60,9 @@ class CarController:
         elif self.red_light:
             print("Red light detected")
             self.motor.stop()
-            while self.red_light:
-                pass
         elif self.person_detected:
             print("Person detected")
             self.motor.stop()
-            while self.person_detected:
-                pass
         else:
             print("No sign or obstacle detected, moving forward")
             if self.current_speed_limit is not None:
@@ -74,7 +70,7 @@ class CarController:
 
             self.motor.move(self.speed, self.curveVal * self.sens, 0.05)
 
-    def update_flags(self):
+    def update_flags(self, interpreter, threshold, top_k, labels):
         ret, frame = cap.read()
         if not ret:
             return
@@ -87,6 +83,7 @@ class CarController:
         self.reset_flags()
         for obj in objs:
             label = labels.get(obj.id, obj.id)
+            print(f"Detected object: {label}")  # Add this line for debugging
 
             if label == "green light":
                 self.green_light = True
@@ -94,6 +91,11 @@ class CarController:
                 self.red_light = True
             elif label == "person":
                 self.person_detected = True
+            elif label == "stop":  # Add this line
+                self.stop_sign = True  # Add this line
+        if not self.red_light and not self.person_detected:
+            self.control_car()
+
 
 def main():
     model_path = 'efficientdet-lite_edgetpu.tflite'
@@ -119,21 +121,30 @@ def main():
         if not ret:
             break
 
+        start_time = time.perf_counter()
         cv2_im = frame
         cv2_im_rgb = cv2.cvtColor(cv2_im, cv2.COLOR_BGR2RGB)
         cv2_im_rgb = cv2.resize(cv2_im_rgb, inference_size)
         run_inference(interpreter, cv2_im_rgb.tobytes())
         objs = get_objects(interpreter, threshold)[:top_k]
+        end_time = time.perf_counter()
+        inference_time = end_time - start_time
+
         cv2_im = append_objs_to_img(cv2_im, inference_size, objs, labels, threshold)
 
         # Call the `process_objects` method with the detected objects and labels
-        car_controller.process_objects(objs, labels)
+        #car_controller.process_objects(objs, labels)
+        # Call the `update_flags` method
+        car_controller.update_flags(interpreter, threshold, top_k, labels)
+
+        # Add the inference time to the displayed image
+        label = 'Inference time: {:.2f} ms'.format(inference_time * 1000)
+        cv2_im = cv2.putText(cv2_im, label, (5, 20),
+                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
         cv2.imshow('Live Inference', cv2_im)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        # Add this line to introduce a small delay
-        cv2.waitKey(1)
 
     cap.release()
     cv2.destroyAllWindows()
