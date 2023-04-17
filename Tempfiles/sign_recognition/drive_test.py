@@ -54,14 +54,14 @@ class CarController:
     def control_car(self):
         print("Controlling car...")
         if self.stop_sign:
-            print("Stop sign detected")
+            print("Stop sign detected, waiting for a while")
             self.motor.stop()
             time.sleep(5)
         elif self.red_light:
-            print("Red light detected")
+            print("Red light detected, stopping")
             self.motor.stop()
         elif self.person_detected:
-            print("Person detected")
+            print("Person detected, stopping")
             self.motor.stop()
         else:
             print("No sign or obstacle detected, moving forward")
@@ -100,8 +100,8 @@ class CarController:
 def main():
     model_path = 'efficientdet-lite_edgetpu.tflite'
     label_path = 'labels.txt'
-    top_k = 10
-    threshold = 0.2
+    top_k = 1
+    threshold = 0.5
 
     print('Loading {} with {} labels.'.format(model_path, label_path))
     interpreter = make_interpreter(model_path)
