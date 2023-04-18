@@ -133,7 +133,12 @@ class CarController:
             if self.current_speed_limit is not None:
                 self.speed = self.current_speed_limit / 100
 
+            # Print the curve and speed values
+            print("Curve value:", self.curveVal)
+            print("Speed value:", self.speed)
+
             self.motor.move(self.speed, self.curveVal * self.sens, 0.05)
+
 
     def update_flags(self, interpreter, threshold, top_k, labels):
         ret, frame = self.video.read()
