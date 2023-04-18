@@ -60,9 +60,9 @@ class LaneFollow:
 
 # Sign Recognition
 class CarController:
-    def __init__(self, motor=None, interpreter=None, threshold=0.6, top_k=3, labels=None):
+    def __init__(self, motor=None, interpreter=None, threshold=0.6, top_k=3, labels_path='labels.txt', video_capture=None):
         self.motor = motor
-        self.video = video_capture or cv2.VideoCapture(0)
+        self.video = video_capture
         self.speed = 0.25
         self.curveVal = 0.0
         self.sens = 1.7
@@ -73,10 +73,20 @@ class CarController:
         self.person_detected = False
         self.interpreter = make_interpreter("efficientdet-lite_edgetpu.tflite")  # Add this line
         self.interpreter.allocate_tensors()  # Add this line
-        self.interpreter = interpreter
         self.threshold = threshold
         self.top_k = top_k
-        self.labels = labels
+        self.labels = self.load_labels(labels_path)
+
+
+    def load_labels(self, path):
+        with open(path, 'r') as f:
+            labels = {}
+            for i, row in enumerate(f.readlines()):
+                label_name = row.strip()
+                labels[i] = label_name
+            return labels
+
+
 
     def process_objects(self, objects, labels):
         print("Processing objects...")
@@ -131,6 +141,7 @@ class CarController:
             return
 
         cv2_im_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        inference_size = input_size(interpreter)
         cv2_im_rgb = cv2.resize(cv2_im_rgb, inference_size)
         run_inference(interpreter, cv2_im_rgb.tobytes())
         objs = get_objects(interpreter, threshold)[:top_k]
@@ -153,14 +164,17 @@ class CarController:
 
 # Autonomous Car combining both Lane Following and Sign Recognition
 class AutonomousCar:
-    def __init__(self, motor=None, interpreter=None):
-        self.lane_follow = LaneFollow(motor)
-        self.car_controller = CarController(self.lane_follow.motor, interpreter)
+    def __init__(self, motor=None, interpreter=None, video_capture=None):
+        self.lane_follow = LaneFollow(motor, video_capture=video_capture)
+        self.car_controller = CarController(self.lane_follow.motor, interpreter, video_capture=video_capture)
 
 
     def run_lane_following(self):
         while True:
-            img = self.lane_follow.video.get_frame()
+            ret, img = self.lane_follow.video.read()
+            if not ret:
+                print("Failed to read frame from the camera")
+                continue
             curve_val = getLaneCurve(img, 1)
             line_curve_val = 0
             line_curve_val = round(line_curve_val, 2)
@@ -179,15 +193,28 @@ class AutonomousCar:
             self.car_controller.update_flags(self.car_controller.interpreter, self.car_controller.threshold, self.car_controller.top_k, self.car_controller.labels)
             cv2.waitKey(1)
 
+    def display_frames(self):
+        while True:
+            ret, frame = self.car_controller.video.read()
+            if not ret:
+                print("Failed to read frame from the camera")
+                continue
+
+            cv2.imshow("Autonomous Car", frame)
+            cv2.waitKey(1)
+
     def run(self):
         lane_following_thread = threading.Thread(target=self.run_lane_following)
         sign_recognition_thread = threading.Thread(target=self.run_sign_recognition)
+        display_frames_thread = threading.Thread(target=self.display_frames)  # Add this line
 
         lane_following_thread.start()
         sign_recognition_thread.start()
+        display_frames_thread.start()  # Add this line
 
         lane_following_thread.join()
         sign_recognition_thread.join()
+        display_frames_thread.join()  # Add this line
 
 
 # Main function
@@ -198,16 +225,9 @@ def main():
     )
     video_capture = cv2.VideoCapture(0)
     motor = Motor(22, 27, 17, 2, 4, 3)
-    lane_follow = LaneFollow(motor, video_capture)
-    print("Running LaneFollow for 5 seconds")
-    lane_follow.motor = motor  # Add this line
-    lane_follow.run(duration=5)
-    car_controller = CarController(motor, interpreter, video_capture=video_capture)
-    # Create an instance of AutonomousCar
-    autonomous_car = AutonomousCar(motor, interpreter)
-    # Start the autonomous car
+    autonomous_car = AutonomousCar(motor, interpreter, video_capture)
     autonomous_car.run()
-    #cap.release()
+    video_capture.release()
     cv2.destroyAllWindows()
 
 
