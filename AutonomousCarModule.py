@@ -167,7 +167,7 @@ class AutonomousCar:
     def __init__(self, motor=None, interpreter=None, video_capture=None):
         self.lane_follow = LaneFollow(motor, video_capture=video_capture)
         self.car_controller = CarController(self.lane_follow.motor, interpreter, video_capture=video_capture)
-
+        self.detected_objects = []
 
     def run_lane_following(self):
         while True:
@@ -190,8 +190,21 @@ class AutonomousCar:
 
     def run_sign_recognition(self):
         while True:
-            self.car_controller.update_flags(self.car_controller.interpreter, self.car_controller.threshold, self.car_controller.top_k, self.car_controller.labels)
+            ret, frame = self.car_controller.video.read()
+            if not ret:
+                continue
+
+            cv2_im_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            inference_size = input_size(self.car_controller.interpreter)
+            cv2_im_rgb_resized = cv2.resize(cv2_im_rgb, inference_size)
+            run_inference(self.car_controller.interpreter, cv2_im_rgb_resized.tobytes())
+            objs = get_objects(self.car_controller.interpreter, self.car_controller.threshold)[:self.car_controller.top_k]
+
+            self.detected_objects = objs  # Update the detected_objects attribute
+
+            self.car_controller.process_objects(objs, self.car_controller.labels)
             cv2.waitKey(1)
+
 
     def display_frames(self):
         while True:
@@ -200,8 +213,31 @@ class AutonomousCar:
                 print("Failed to read frame from the camera")
                 continue
 
+            self.draw_objects_on_frame(frame, input_size(self.car_controller.interpreter), self.detected_objects, self.car_controller.labels, self.car_controller.threshold)  # Updated call
+
             cv2.imshow("Autonomous Car", frame)
             cv2.waitKey(1)
+
+
+
+    def draw_objects_on_frame(self, frame, inference_size, objects, labels, threshold):
+        height, width, channels = frame.shape
+        scale_x, scale_y = width / inference_size[0], height / inference_size[1]
+
+        for obj in objects:
+            if obj.score < threshold:
+                continue
+
+            bbox = obj.bbox.scale(scale_x, scale_y)
+            x0, y0 = int(bbox.xmin), int(bbox.ymin)
+            x1, y1 = int(bbox.xmax), int(bbox.ymax)
+
+            percent = int(100 * obj.score)
+            label = '{}% {}'.format(percent, labels.get(obj.id, obj.id))
+
+            frame = cv2.rectangle(frame, (x0, y0), (x1, y1), (0, 255, 0), 2)
+            frame = cv2.putText(frame, label, (x0, y0-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
 
     def run(self):
         lane_following_thread = threading.Thread(target=self.run_lane_following)
