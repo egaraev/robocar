@@ -60,12 +60,12 @@ class LaneFollow:
 
 # Sign Recognition
 class CarController:
-    def __init__(self, motor=None, interpreter=None, threshold=0.6, top_k=3, labels_path='labels.txt', video_capture=None):
+    def __init__(self, motor=None, interpreter=None, threshold=0.6, top_k=1, labels_path='labels.txt', video_capture=None):
         self.motor = motor
         self.video = video_capture
         self.speed = 0.25
         self.curveVal = 0.0
-        self.sens = 1.7
+        self.sens = 1.5
         self.current_speed_limit = None
         self.green_light = False
         self.red_light = False
@@ -183,14 +183,14 @@ class AutonomousCar:
             curve_val = getLaneCurve(img, 1)
             line_curve_val = 0
             line_curve_val = round(line_curve_val, 2)
-            average_curve_val = (curve_val + line_curve_val) / 2
+            average_curve_val = (curve_val + line_curve_val) #/ 2
 
             if curve_val > self.lane_follow.max_speed:
                 curve_val = self.lane_follow.max_speed
             elif curve_val < -self.lane_follow.max_speed:
                 curve_val = -self.lane_follow.max_speed
 
-            self.car_controller.curveVal = curve_val
+            self.car_controller.curveVal = average_curve_val
             cv2.waitKey(1)
 
     def run_sign_recognition(self):
